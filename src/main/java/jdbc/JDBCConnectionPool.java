@@ -41,35 +41,9 @@ public class JDBCConnectionPool {
 
     public static void main(String[] args){
 
-//        Config config = Utilities.readConfig();
-//        if(config == null) {
-//            System.exit(1);
-//        }
-
-        // Make sure that mysql-connector-java is added as a dependency.
-        // Force Maven to Download Sources and Documentation
-//        try (java.sql.Connection con = DriverManager
-//                .getConnection("jdbc:mysql://localhost:3308/" + config.getDatabase(), config.getUsername(), config.getPassword())) {
-//
-//            executeSelectAndPrint(con);
-//            System.out.println("*****************");
-//
-//            executeInsert(con,"Sami", 2024, "srollins", "2006-09-01");
-//
-//            executeSelectAndPrint(con);
-//            System.out.println("*****************");
-//
-//            executeInsert(con,"Bertha", 9876, "bzuniga", "2009-09-01");
-//
-//            executeSelectAndPrint(con);
-//            System.out.println("*****************");
-//
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        }
-
         try (Connection connection = DBCPDataSource.getConnection()){
-            executeInsert(connection, "Jose", 9985, "john", "2026-09-01");
+//            executeInsert(connection, "Jose", 9985, "john", "2026-09-01");
+            executeSelectAndPrint(connection);
         } catch(SQLException e) {
             e.printStackTrace();
         }

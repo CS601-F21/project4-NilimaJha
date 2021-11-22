@@ -3,7 +3,7 @@ package utils;
 /**
  * A class to store the properties of the JSON configuration file.
  */
-public class Config {
+public class JDBCConfig {
     private String database;
     private String username;
     private String password;
@@ -14,7 +14,7 @@ public class Config {
      * @param username
      * @param password
      */
-    public Config(String database, String username, String password) {
+    public JDBCConfig(String database, String username, String password) {
         this.database = database;
         this.username = username;
         this.password = password;

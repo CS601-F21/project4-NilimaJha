@@ -4,25 +4,27 @@ import com.google.gson.Gson;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.ObjectInputFilter;
 
+/**
+ * A utility class.
+ */
 public class Utilities {
 
-    public static final String configFileName = "config.json";
+    public static final String configFileName = "jdbcConfig.json";
 
     /**
      * Read in the configuration file.
-     * @return
+     * @return Config object
      */
-    public static Config readConfig() {
+    public static JDBCConfig readJDBCConfig() {
 
-        Config config = null;
+        JDBCConfig jdbcConfig = null;
         Gson gson = new Gson();
         try {
-            config = gson.fromJson(new FileReader(configFileName), Config.class);
+            jdbcConfig = gson.fromJson(new FileReader(configFileName), JDBCConfig.class);
         } catch (FileNotFoundException e) {
             System.err.println("Config file config.json not found: " + e.getMessage());
         }
-        return config;
+        return jdbcConfig;
     }
 }
