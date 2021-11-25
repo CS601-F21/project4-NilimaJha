@@ -1,8 +1,13 @@
-package web;
+package web.login;
 
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.io.StringReader;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 public class LoginUtilities {
@@ -30,6 +35,7 @@ public class LoginUtilities {
      * @return
      */
     public static String generateSlackAuthorizeURL(String clientId, String state, String nonce, String redirectURI) {
+        System.out.println("Session ID while generating slackAuthorizedURL : " +state);
 
         String url = String.format("https://%s/%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
                 LoginServerConstants.HOST,
@@ -81,7 +87,9 @@ public class LoginUtilities {
      * @return
      */
     public static Map<String, Object> jsonStrToMap(String jsonString) {
+        System.out.println("jsonString from slack :-" + jsonString);
         Map<String, Object> map = gson.fromJson(new StringReader(jsonString), Map.class);
+        System.out.println("State :" +map.get(LoginServerConstants.STATE_KEY));
         return map;
     }
 
@@ -94,14 +102,17 @@ public class LoginUtilities {
      * @return
      */
     public static ClientInfo verifyTokenResponse(Map<String, Object> map, String sessionId) {
+        System.out.println("verifying tokenResponse received from slack");
 
         // verify ok: true
         if(!map.containsKey(LoginServerConstants.OK_KEY) || !(boolean)map.get(LoginServerConstants.OK_KEY)) {
+            System.out.println("tokenResponse is not valid.1");
             return null;
         }
 
         // verify state is the users session cookie id
         if(!map.containsKey(LoginServerConstants.STATE_KEY) || !map.get(LoginServerConstants.STATE_KEY).equals(sessionId)) {
+//            System.out.println("tokenResponse is not valid.2");
             System.out.println(map.get(LoginServerConstants.STATE_KEY));
             System.out.println(sessionId);
             return null;
@@ -115,12 +126,22 @@ public class LoginUtilities {
         String expectedNonce = generateNonce(sessionId);
         String actualNonce = (String) payloadMap.get(LoginServerConstants.NONCE_KEY);
         if(!expectedNonce.equals(actualNonce)) {
+//            System.out.println("tokenResponse nonce is not valid.3");
             return null;
         }
 
         // extract name from response
+        System.out.println("~~~~~~~~~~~~~");
+        Set<String> set = payloadMap.keySet();
+        Iterator iter = set.iterator();
+        while (iter.hasNext()) {
+            System.out.println(iter.next());
+        }
+        System.out.println("~~~~~~~~~~~~~");
         String username = (String) payloadMap.get(LoginServerConstants.NAME_KEY);
-        return new ClientInfo(username);
+        String email = (String) payloadMap.get(LoginServerConstants.EMAIL_KEY);
+        System.out.println("tokenResponse.4");
+        return new ClientInfo(username, email, (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY));
     }
 
     /**
