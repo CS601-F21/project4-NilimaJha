@@ -1,6 +1,7 @@
 package web.login;
 
 import com.google.gson.Gson;
+import model.User;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.StringReader;
@@ -101,7 +102,7 @@ public class LoginUtilities {
      * @param sessionId
      * @return
      */
-    public static ClientInfo verifyTokenResponse(Map<String, Object> map, String sessionId) {
+    public static User verifyTokenResponse(Map<String, Object> map, String sessionId) {
         System.out.println("verifying tokenResponse received from slack");
 
         // verify ok: true
@@ -138,10 +139,15 @@ public class LoginUtilities {
             System.out.println(iter.next());
         }
         System.out.println("~~~~~~~~~~~~~");
-        String username = (String) payloadMap.get(LoginServerConstants.NAME_KEY);
-        String email = (String) payloadMap.get(LoginServerConstants.EMAIL_KEY);
+        String userName = (String) payloadMap.get(LoginServerConstants.NAME_KEY);
+        String userEmailId = (String) payloadMap.get(LoginServerConstants.EMAIL_KEY);
+        String userAccessToken = (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY);
+        System.out.println(userName);
+        System.out.println(userEmailId);
+        System.out.println(userAccessToken);
         System.out.println("tokenResponse.4");
-        return new ClientInfo(username, email, (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY));
+        return new User(userEmailId, userName, userAccessToken);
+//        return new ClientInfo(username, email, (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY));
     }
 
     /**
