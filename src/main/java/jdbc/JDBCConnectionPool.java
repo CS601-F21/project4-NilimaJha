@@ -1,28 +1,61 @@
 package jdbc;
 
+import model.User;
+
 import java.sql.*;
 
 public class JDBCConnectionPool {
 
     /**
      * A method to perform Insert into usersInfo table in database using a PreparedStatement.
-     * @param con
-     * @param userEmailId
-     * @param userName
-     * @param userAcsessToken
+     *
+     * @param user
      * @throws SQLException
      */
-    public static void executeInsertInUserInfo(java.sql.Connection con, String userEmailId, String userName, String userAcsessToken) throws SQLException {
+    public static void executeInsertInUserInfo(User user) throws SQLException {
         //write-userInfoTableLock for insert into usersInfo table
-        String insertUserInfoSql = "INSERT INTO usersInfo (user_email_id, user_name, user_access_token) VALUES (?, ?, ?);";
-        PreparedStatement insertUerInfoStmt = con.prepareStatement(insertUserInfoSql);
-        insertUerInfoStmt.setString(1, userEmailId);
-        insertUerInfoStmt.setString(2, userName);
-        insertUerInfoStmt.setString(3, userAcsessToken);
-        System.out.println(insertUserInfoSql);
-        insertUerInfoStmt.executeUpdate();
-        System.out.println("one line executed in usersInfo table in DB.");
+        try (Connection connection = DBCPDataSource.getConnection()) {
+            String insertUserInfoSql = "INSERT INTO usersInfo (user_email_id, user_name, user_access_token) VALUES (?, ?, ?);";
+            PreparedStatement insertUerInfoStmt = connection.prepareStatement(insertUserInfoSql);
+            insertUerInfoStmt.setString(1, user.getUserEmailId());
+            insertUerInfoStmt.setString(2, user.getUserName());
+            insertUerInfoStmt.setString(3, user.getUserAccessToken());
+            System.out.println((String)insertUserInfoSql);
+            insertUerInfoStmt.executeUpdate();
+            System.out.println("one line executed in usersInfo table in DB.");
+        }
     }
+
+    /**
+     * A method to perform select from userInfo table where user_email_id matches the given email_id.
+     * A PrepareStatement is used to execute this query.
+     * @throws SQLException
+     */
+    public static User findUserFromUserInfoByEmailId (String userEmailId) throws SQLException {
+        //read-userInfoTableLock on usersInfo table
+        try (Connection connection = DBCPDataSource.getConnection()) {
+            System.out.println("____________Searching user with email- " + userEmailId);
+            String selectUserInfoSql = "SELECT * FROM usersInfo WHERE user_email_id = ?;";
+            PreparedStatement selectUserInfoSqlStmt = connection.prepareStatement(selectUserInfoSql);
+            selectUserInfoSqlStmt.setString(1, userEmailId);
+            ResultSet resultSet = selectUserInfoSqlStmt.executeQuery();
+            System.out.println("_______________Query on usersInfo" + (String)selectUserInfoSql);
+            User user = new User(resultSet);
+            System.out.println("_______________user object created from result set");
+            System.out.println("________________User info obtained from DB\n" + user.getUserEmailId() +"\n______" + user.getUserName()+ "\n______" +user.getUserAccessToken());
+//            if (resultSet.next()) {
+//                System.out.println("Returned User from findUserFromDB. Not null");
+//                return user;
+//            } else {
+//                System.out.println("Returned User from findUserFromDB.Null");
+//                return null;
+//            }
+            System.out.println("Returned User from findUserFromDB.Username = " +user.getUserName());
+            return user;
+        }
+    }
+
+
 
     /**
      * A method to perform select from userInfo table where user_email_id matches the given email_id.
@@ -42,6 +75,8 @@ public class JDBCConnectionPool {
             System.out.printf("user_access_token: %s\n", results.getString("user_access_token"));
         }
     }
+
+
 
 
 
