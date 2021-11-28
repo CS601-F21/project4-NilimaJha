@@ -1,5 +1,13 @@
 package model;
 
+import org.jetbrains.annotations.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -7,12 +15,22 @@ import java.sql.SQLException;
  * Class to store
  * @author nilimajha
  */
+
 public class User {
     private String userEmailId;
-    private String userName;
     private String userAccessToken;
+
+    @NotEmpty
+    private String userName;
+
+    @NotEmpty
     private String dateOfBirth;
-    private long phone;
+
+    @NotEmpty
+    @Size(max = 10, min = 10, message = "Mobile number should be of 10 digits")
+    @Pattern(regexp = "[0-9][0-9]{9}", message = "Mobile number is invalid!!")
+    private String phone;
+    private boolean completeProfile;
 
     public User() {
     }
@@ -35,10 +53,16 @@ public class User {
                 this.userAccessToken = rs.getString("user_access_token");
             }
             if (!rs.wasNull()) {
+                System.out.println("#################################################");
                 this.dateOfBirth = rs.getString("date_of_birth");
+                System.out.println("###############################################"+dateOfBirth);
             }
             if (!rs.wasNull()) {
-                this.phone = rs.getLong("phone");
+                this.phone = rs.getString("phone_number");
+//                this.phone = rs.getLong("phone");
+            }
+            if (!rs.wasNull()) {
+                this.completeProfile = rs.getBoolean("complete_profile");
             }
         } else {
             System.out.println("result set was empty...");
@@ -61,7 +85,7 @@ public class User {
         return dateOfBirth;
     }
 
-    public long getPhone() {
+    public String getPhone() {
         return phone;
     }
 
@@ -81,8 +105,16 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public void setPhone(long phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public boolean isCompleteProfile() {
+        return completeProfile;
+    }
+
+    public void setCompleteProfile(boolean completeProfile) {
+        this.completeProfile = completeProfile;
     }
 
     public boolean isValid() {
