@@ -1,5 +1,6 @@
 package jdbc;
 
+import model.Event;
 import model.User;
 
 import java.sql.*;
@@ -66,22 +67,31 @@ public class JDBCConnectionPool {
     }
 
     /**
-     * A method to demonstrate using a PreparedStatement to execute a database insert.
-     * @param con
-     * @param name
-     * @param extension
-     * @param email
-     * @param startdate
+     * A method to insert new event into events table using a PreparedStatement.
+     * @param event
      * @throws SQLException
      */
-    public static void executeInsert(java.sql.Connection con, String name, int extension, String email, String startdate) throws SQLException {
-        String insertContactSql = "INSERT INTO contacts (name, extension, email, startdate) VALUES (?, ?, ?, ?);";
-        PreparedStatement insertContactStmt = con.prepareStatement(insertContactSql);
-        insertContactStmt.setString(1, name);
-        insertContactStmt.setInt(2, extension);
-        insertContactStmt.setString(3, email);
-        insertContactStmt.setString(4, startdate);
-        insertContactStmt.executeUpdate();
+    public static void executeInsertIntoEvents(Event event) throws SQLException {
+        String createNewEventSql = "INSERT INTO events " +
+                "(event_name, event_organizer, event_date, " +
+                "event_location, event_categories, event_description, " +
+                "total_ticket, tickets_available, event_status, created_on) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (Connection connection = DBCPDataSource.getConnection()) {
+            PreparedStatement createNewEventStm = connection.prepareStatement(createNewEventSql);
+            createNewEventStm.setString(1, event.getEventName());
+            createNewEventStm.setString(2, event.getEventOrganizer());
+            createNewEventStm.setString(3, event.getEventDate());
+            createNewEventStm.setString(4, event.getEventLocation());
+            createNewEventStm.setString(5, event.getEventCategories());
+            createNewEventStm.setString(6, event.getEventDescription());
+            createNewEventStm.setInt(7, event.getTotalTickets());
+            createNewEventStm.setInt(8, event.getTicketsAvailable());
+            createNewEventStm.setString(9, event.getEventStatus());
+            createNewEventStm.setString(10, event.getEventCreatedOn());
+            createNewEventStm.executeUpdate();
+        }
+
     }
 
     /**
