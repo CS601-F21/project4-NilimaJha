@@ -103,51 +103,36 @@ public class LoginUtilities {
      * @return
      */
     public static User verifyTokenResponse(Map<String, Object> map, String sessionId) {
-        System.out.println("verifying tokenResponse received from slack");
-
         // verify ok: true
         if(!map.containsKey(LoginServerConstants.OK_KEY) || !(boolean)map.get(LoginServerConstants.OK_KEY)) {
             System.out.println("tokenResponse is not valid.1");
             return null;
         }
-
         // verify state is the users session cookie id
         if(!map.containsKey(LoginServerConstants.STATE_KEY) || !map.get(LoginServerConstants.STATE_KEY).equals(sessionId)) {
-//            System.out.println("tokenResponse is not valid.2");
             System.out.println(map.get(LoginServerConstants.STATE_KEY));
             System.out.println(sessionId);
             return null;
         }
-
         // retrieve and decode id_token
         String idToken = (String)map.get("id_token");
         Map<String, Object> payloadMap = decodeIdTokenPayload(idToken);
-
         //verify nonce
         String expectedNonce = generateNonce(sessionId);
         String actualNonce = (String) payloadMap.get(LoginServerConstants.NONCE_KEY);
         if(!expectedNonce.equals(actualNonce)) {
-//            System.out.println("tokenResponse nonce is not valid.3");
             return null;
         }
-
         // extract name from response
-        System.out.println("~~~~~~~~~~~~~");
         Set<String> set = payloadMap.keySet();
         Iterator iter = set.iterator();
         while (iter.hasNext()) {
             System.out.println(iter.next());
         }
-        System.out.println("~~~~~~~~~~~~~");
         String userName = (String) payloadMap.get(LoginServerConstants.NAME_KEY);
         String userEmailId = (String) payloadMap.get(LoginServerConstants.EMAIL_KEY);
         String userAccessToken = (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY);
-        System.out.println(userName);
-        System.out.println(userEmailId);
-        System.out.println(userAccessToken);
-        System.out.println("tokenResponse.4");
         return new User(userEmailId, userName, userAccessToken);
-//        return new ClientInfo(username, email, (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY));
     }
 
     /**
@@ -174,8 +159,4 @@ public class LoginUtilities {
         Map<String, Object> payloadMap = gson.fromJson(new StringReader(payload), Map.class);
         return payloadMap;
     }
-
-//    public static void main(String[] args) {
-//        System.out.println(generateSlackAuthorizeURL("abc", "123", "def", "url"));
-//    }
 }

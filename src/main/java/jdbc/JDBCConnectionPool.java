@@ -8,21 +8,21 @@ public class JDBCConnectionPool {
 
     /**
      * A method to perform Insert into usersInfo table in database using a PreparedStatement.
-     *
      * @param user
      * @throws SQLException
      */
     public static void executeInsertInUserInfo(User user) throws SQLException {
         //write-userInfoTableLock for insert into usersInfo table
         try (Connection connection = DBCPDataSource.getConnection()) {
-            String insertUserInfoSql = "INSERT INTO usersInfo (user_email_id, user_name, user_access_token) VALUES (?, ?, ?);";
+            String insertUserInfoSql = "INSERT INTO usersInfo (user_email_id, user_name, user_access_token, complete_profile) VALUES (?, ?, ?, ?);";
             PreparedStatement insertUerInfoStmt = connection.prepareStatement(insertUserInfoSql);
             insertUerInfoStmt.setString(1, user.getUserEmailId());
             insertUerInfoStmt.setString(2, user.getUserName());
             insertUerInfoStmt.setString(3, user.getUserAccessToken());
-            System.out.println((String)insertUserInfoSql);
+            insertUerInfoStmt.setBoolean(4, false);
+            System.out.println("Query on userInfo: " + insertUerInfoStmt);
             insertUerInfoStmt.executeUpdate();
-            System.out.println("one line executed in usersInfo table in DB.");
+            System.out.println("One line executed in usersInfo table in DB.");
         }
     }
 
@@ -34,51 +34,36 @@ public class JDBCConnectionPool {
     public static User findUserFromUserInfoByEmailId (String userEmailId) throws SQLException {
         //read-userInfoTableLock on usersInfo table
         try (Connection connection = DBCPDataSource.getConnection()) {
-            System.out.println("____________Searching user with email- " + userEmailId);
             String selectUserInfoSql = "SELECT * FROM usersInfo WHERE user_email_id = ?;";
             PreparedStatement selectUserInfoSqlStmt = connection.prepareStatement(selectUserInfoSql);
             selectUserInfoSqlStmt.setString(1, userEmailId);
+            System.out.println("Query on usersInfo: " + selectUserInfoSqlStmt);
             ResultSet resultSet = selectUserInfoSqlStmt.executeQuery();
-            System.out.println("_______________Query on usersInfo" + (String)selectUserInfoSql);
             User user = new User(resultSet);
-            System.out.println("_______________user object created from result set");
-            System.out.println("________________User info obtained from DB\n" + user.getUserEmailId() +"\n______" + user.getUserName()+ "\n______" +user.getUserAccessToken());
-//            if (resultSet.next()) {
-//                System.out.println("Returned User from findUserFromDB. Not null");
-//                return user;
-//            } else {
-//                System.out.println("Returned User from findUserFromDB.Null");
-//                return null;
-//            }
-            System.out.println("Returned User from findUserFromDB.Username = " +user.getUserName());
             return user;
         }
     }
 
-
-
     /**
      * A method to perform select from userInfo table where user_email_id matches the given email_id.
      * A PrepareStatement is used to execute this query.
-     * @param con
      * @throws SQLException
      */
-    public static void executeSelectFromUserInfoWhere(java.sql.Connection con, String userEmailId) throws SQLException {
+    public static void updateUserInfoTable (String userEmailId, User user) throws SQLException {
         //read-userInfoTableLock on usersInfo table
-        String selectUserInfoSql = "SELECT * FROM usersInfo WHERE user_email_id = ?;";
-        PreparedStatement selectUserInfoSqlStmt = con.prepareStatement(selectUserInfoSql);
-        selectUserInfoSqlStmt.setString(1, userEmailId);
-        ResultSet results = selectUserInfoSqlStmt.executeQuery();
-        while(results.next()) {
-            System.out.printf("user_email_id: %s\n", results.getString("user_email_id"));
-            System.out.printf("user_name: %s\n", results.getString("user_name"));
-            System.out.printf("user_access_token: %s\n", results.getString("user_access_token"));
+        try (Connection connection = DBCPDataSource.getConnection()) {
+            String updateUserInfoSql = "UPDATE usersInfo SET user_name = ?, phone_number = ?, date_of_birth = ?, complete_profile = ? WHERE user_email_id = ?";
+            PreparedStatement updateUserInfoSqlStm = connection.prepareStatement(updateUserInfoSql);
+            updateUserInfoSqlStm.setString(1, user.getUserName());
+            updateUserInfoSqlStm.setString(2, user.getPhone());
+            updateUserInfoSqlStm.setString(3, user.getDateOfBirth());
+            updateUserInfoSqlStm.setBoolean(4, true);
+            updateUserInfoSqlStm.setString(5, userEmailId);
+            System.out.println("Query on usersInfo: " + updateUserInfoSqlStm);
+            int updateResult = updateUserInfoSqlStm.executeUpdate();
+            System.out.println(updateResult);
         }
     }
-
-
-
-
 
     /**
      * A method to demonstrate using a PreparedStatement to execute a database insert.
@@ -171,7 +156,7 @@ public class JDBCConnectionPool {
 //            insertContactStmt.executeUpdate();
             System.out.println("____________________");
 //            executeInsertInUserInfo(connection, "nilimajha18aug@gmail.com", "nilima jha", "mnbvcxzasdfghjkl");
-            executeSelectFromUserInfoWhere(connection, "nilinajha0818@gmail.com");
+//            executeSelectFromUserInfoWhere(connection, "nilinajha0818@gmail.com");
 //            executeSelectAllFromSessionInfoWhere(connection, "12345678abc");
             System.out.println("____________________");
 //            executeSelectAndPrintForSession(connection);
