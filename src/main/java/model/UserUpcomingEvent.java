@@ -1,13 +1,13 @@
 package model;
 
-public class UserUpcomingEventsInfo {
+public class UserUpcomingEvent {
     private Event event = new Event();
     private int totalTickets;
 
-    public UserUpcomingEventsInfo () {
+    public UserUpcomingEvent() {
     }
 
-    public UserUpcomingEventsInfo(Event event, int totalTickets) {
+    public UserUpcomingEvent(Event event, int totalTickets) {
         this.event = event;
         this.totalTickets = totalTickets;
     }
