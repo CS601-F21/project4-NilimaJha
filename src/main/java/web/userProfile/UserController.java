@@ -33,10 +33,7 @@ public class UserController {
             User user = null;
             try (Connection connection = DBCPDataSource.getConnection()) {
                 user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
-                model.addAttribute("userName", user.getUserName());
-                model.addAttribute("userEmailId", user.getUserEmailId());
-                model.addAttribute("dateOfBirth", user.getDateOfBirth());
-                model.addAttribute("phoneNumber", user.getPhone());
+                model.addAttribute("user", user);
                 //extract total number of events created by the user from events table.
             } catch (SQLException e) {
                 e.printStackTrace();
