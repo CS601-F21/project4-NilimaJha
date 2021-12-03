@@ -3,6 +3,7 @@ package web.login;
 import jdbc.DBCPDataSource;
 import jdbc.JDBCConnectionPool;
 import model.User;
+import model.UserUpcomingEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import static jdbc.JDBCConnectionPool.updateUserInfoTable;
@@ -58,17 +60,42 @@ public class LoginController {
         if (emailId != null) {
             // already authed, no need to log in
             User user = null;
-//            try (Connection connection = DBCPDataSource.getConnection()){
+            List<UserUpcomingEvent> userUpcomingEventList = null;
             try {
                 user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                userUpcomingEventList = JDBCConnectionPool.allUpcomingEvents(user.getUserEmailId());
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                System.out.println("USER INFO");
+                System.out.println("User email Id   : " + user.getUserEmailId());
+                System.out.println("User name       : " + user.getUserName());
+                System.out.println("User Phone      : " + user.getPhone());
+                System.out.println("User DOB        : " + user.getDateOfBirth());
+                System.out.println("User token      : " + user.getUserAccessToken());
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                System.out.println("USER UPCOMING EVENTS LIST");
+                for (UserUpcomingEvent userUpcomingEvent : userUpcomingEventList) {
+                    System.out.println("User email Id   : " + userUpcomingEvent.getEvent().getEventId());
+                    System.out.println("User name       : " + userUpcomingEvent.getEvent().getEventName());
+                    System.out.println("User Phone      : " + userUpcomingEvent.getEvent().getEventDate());
+                    System.out.println("User DOB        : " + userUpcomingEvent.getEvent().getEventCategories());
+                    System.out.println("User token      : " + userUpcomingEvent.getTotalTickets());
+                    System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                }
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
             } catch(SQLException e) {
                 e.printStackTrace();
             }
             if (user.isCompleteProfile() == true) {
-                model.addAttribute("userName", user.getUserName());
+//                model.addAttribute("userName", user.getUserName());
+                String tableCaption = "Upcoming Events";
+                model.addAttribute("tableCaption", tableCaption);
+                model.addAttribute("user", user);
+                model.addAttribute("upcomingEventList", userUpcomingEventList);
                 return "home";
             } else {
                 model.addAttribute("user", user);
+                model.addAttribute("upcomingEventList", userUpcomingEventList);
                 return "completeProfile";
             }
         } else {
