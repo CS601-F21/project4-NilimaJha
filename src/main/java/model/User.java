@@ -53,9 +53,7 @@ public class User {
                 this.userAccessToken = rs.getString("user_access_token");
             }
             if (!rs.wasNull()) {
-                System.out.println("#################################################");
                 this.dateOfBirth = rs.getString("date_of_birth");
-                System.out.println("###############################################"+dateOfBirth);
             }
             if (!rs.wasNull()) {
                 this.phone = rs.getString("phone_number");
