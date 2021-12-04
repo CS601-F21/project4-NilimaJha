@@ -106,12 +106,15 @@ public class LoginUtilities {
         // verify ok: true
         if(!map.containsKey(LoginServerConstants.OK_KEY) || !(boolean)map.get(LoginServerConstants.OK_KEY)) {
             System.out.println("tokenResponse is not valid.1");
+            System.out.println("1....Returning User = null ");
             return null;
         }
         // verify state is the users session cookie id
         if(!map.containsKey(LoginServerConstants.STATE_KEY) || !map.get(LoginServerConstants.STATE_KEY).equals(sessionId)) {
             System.out.println(map.get(LoginServerConstants.STATE_KEY));
             System.out.println(sessionId);
+            System.out.println("Something wrong with state.");
+            System.out.println("2....Returning User = null ");
             return null;
         }
         // retrieve and decode id_token
@@ -121,17 +124,20 @@ public class LoginUtilities {
         String expectedNonce = generateNonce(sessionId);
         String actualNonce = (String) payloadMap.get(LoginServerConstants.NONCE_KEY);
         if(!expectedNonce.equals(actualNonce)) {
+            System.out.println("Something wrong with nouns.");
+            System.out.println("3....Returning User = null ");
             return null;
         }
         // extract name from response
         Set<String> set = payloadMap.keySet();
         Iterator iter = set.iterator();
         while (iter.hasNext()) {
-            System.out.println(iter.next());
+            System.out.println("#####" + iter.next());
         }
         String userName = (String) payloadMap.get(LoginServerConstants.NAME_KEY);
         String userEmailId = (String) payloadMap.get(LoginServerConstants.EMAIL_KEY);
         String userAccessToken = (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY);
+        System.out.println("4.......Returning valid user...");
         return new User(userEmailId, userName, userAccessToken);
     }
 
