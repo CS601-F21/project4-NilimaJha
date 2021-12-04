@@ -1,8 +1,11 @@
 package jdbc;
 
 import model.*;
+import web.login.LoginServerConstants;
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -299,7 +302,9 @@ public class JDBCConnectionPool {
                 System.out.println("TicketAvailability Update after purchase : " + updateTotalTicketValueSqlStm);
                 updateTotalTicketValueSqlStm.executeUpdate();
                 // create constant file add transaction type = B
-                Transaction transaction = new Transaction('B', tickets.getTicketOwnerId(), tickets.getEventId());
+                Transaction transaction = new Transaction(LoginServerConstants.TRANSACTION_TYPE_PURCHASED, tickets.getTicketOwnerId(), tickets.getEventId());
+                String transactionMessage = generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_PURCHASED);
+                transaction.setTransactionDetail(transactionMessage);
                 Boolean updateTransactionTable = insertIntoTransactionTable(transaction);
                 System.out.println(availableTickets + " tickets processing done '" + updateTransactionTable + "'. inserted in DB.");
                 return updateTransactionTable;
@@ -312,14 +317,31 @@ public class JDBCConnectionPool {
         //release both locks;
     }
 
+    /**
+     * method to generate message for each transaction.
+     * @param transactionType
+     * @return
+     */
+    public static String generateTransactionDetailMessage(String transactionType) {
+        if (transactionType.equals("Purchased")) {
+            return "Purchased New Tickets.";
+        } else if (transactionType.equals("Transferred")){
+            return "Transferred ticket to other user.";
+        } else {
+            return "Received ticket from other user.";
+        }
+    }
+
+
     public static boolean insertIntoTransactionTable(Transaction transaction) throws SQLException {
         //acquire transaction-table write lock
-        String updateTransactionTableSql = "INSERT INTO transactions (transaction_type, user_email_id, event_id) VALUES (?, ?, ?);";
+        String updateTransactionTableSql = "INSERT INTO transactions (transaction_type, user_email_id, event_id, transaction_details) VALUES (?, ?, ?, ?);";
         try (Connection connection = DBCPDataSource.getConnection()) {
             PreparedStatement updateTransactionTableSqlStm = connection.prepareStatement(updateTransactionTableSql);
-            updateTransactionTableSqlStm.setString(1, String.valueOf(transaction.getTransaction_type()));
-            updateTransactionTableSqlStm.setString(2, transaction.getUser_email_id());
-            updateTransactionTableSqlStm.setInt(3, transaction.getEvent_id());
+            updateTransactionTableSqlStm.setString(1, String.valueOf(transaction.getTransactionType()));
+            updateTransactionTableSqlStm.setString(2, transaction.getUserEmailId());
+            updateTransactionTableSqlStm.setInt(3, transaction.getEventId());
+            updateTransactionTableSqlStm.setString(4, transaction.getTransactionDetail());
             System.out.println("insertIntoTransactionTable Prepared Statement : " + updateTransactionTableSqlStm);
             int executionResult = updateTransactionTableSqlStm.executeUpdate();
             if (executionResult == 0) {
@@ -334,13 +356,13 @@ public class JDBCConnectionPool {
         //acquire tickets-table read lock and Event read lock
         //SELECT () FROM
         //SELECT events.event_id, event_name, event_date, event_categories FROM events JOIN tickets_list ON events.event_id = tickets_list.event_id WHERE tickets_list.ticket_owner_id = 'njha2@dons.usfca.edu' AND events.event_date >= CURRENT_DATE;
-        String selectUpcomingEventsSql = "SELECT events.event_id, event_name, event_date, event_categories FROM " +
-                "events JOIN tickets_list ON events.event_id = tickets_list.event_id WHERE " +
+        String selectUpcomingEventsSql = "SELECT events.event_id, event_name, event_date, event_categories, " +
+                "tickets_list.ticket_id FROM events JOIN tickets_list ON events.event_id = tickets_list.event_id WHERE " +
                 "tickets_list.ticket_owner_id = ? AND events.event_date >= CURRENT_DATE;";
         try (Connection connection = DBCPDataSource.getConnection()) {
             PreparedStatement selectUpcomingEventsSqlStm = connection.prepareStatement(selectUpcomingEventsSql);
             selectUpcomingEventsSqlStm.setString(1, userId);
-            System.out.println("insertIntoTransactionTable Prepared Statement : " + selectUpcomingEventsSqlStm);
+            System.out.println("selectUpcomingEventsSql Prepared Statement : " + selectUpcomingEventsSqlStm);
             ResultSet resultSet = selectUpcomingEventsSqlStm.executeQuery();
             List<UserUpcomingEvent> userUpcomingEventsList = new ArrayList<>();
             List<Integer> eventIds = new ArrayList<>();
@@ -354,6 +376,7 @@ public class JDBCConnectionPool {
                 event.setEventCategories(resultSet.getString("event_categories"));
                 userUpcomingEvent.setEvent(event);
                 userUpcomingEvent.setTotalTickets(1);
+                userUpcomingEvent.addIntoTicketIdList(resultSet.getInt("ticket_id"));
                 userUpcomingEventsList.add(userUpcomingEvent);
             }
             while (resultSet.next()) {
@@ -361,6 +384,7 @@ public class JDBCConnectionPool {
                     for (UserUpcomingEvent eachUserUpcomingEvent : userUpcomingEventsList) {
                         if (eachUserUpcomingEvent.getEvent().getEventId() == resultSet.getInt("event_id")) {
                             eachUserUpcomingEvent.setTotalTickets(eachUserUpcomingEvent.getTotalTickets() + 1);
+                            eachUserUpcomingEvent.addIntoTicketIdList(resultSet.getInt("ticket_id"));
                         }
                     }
                 } else {
@@ -373,6 +397,7 @@ public class JDBCConnectionPool {
                     event.setEventCategories(resultSet.getString("event_categories"));
                     userUpcomingEvent.setEvent(event);
                     userUpcomingEvent.setTotalTickets(1);
+                    userUpcomingEvent.addIntoTicketIdList(resultSet.getInt("ticket_id"));
                     userUpcomingEventsList.add(userUpcomingEvent);
                 }
             }
@@ -380,9 +405,86 @@ public class JDBCConnectionPool {
         }
     }
 
+    public static boolean updateTicketsAndTransactionTableForTransfer(TicketTransfer ticketTransfer) throws SQLException {
+        //acquire ticket-table write lock
+        //acquire transaction table write lock
+        //
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        String currentDate = dtf.format(now);
+        System.out.println("Date :" + currentDate);
+        //
+        String updateTicketTableSql = "UPDATE tickets_list SET ticket_owner_id = ?, purchase_date = ? WHERE ticket_id = ?;";
+        try (Connection connection = DBCPDataSource.getConnection()) {
+            PreparedStatement updateTicketTableSqlStm = connection.prepareStatement(updateTicketTableSql);
+            updateTicketTableSqlStm.setString(1, ticketTransfer.getTransferee());
+            updateTicketTableSqlStm.setString(2, currentDate);
+            int totalUpdate = 0;
+            for (int eachTicketId : ticketTransfer.getTicketIdList()) {
+                updateTicketTableSqlStm.setInt(3, eachTicketId);
+                System.out.println("1eachTicketId : " + eachTicketId);
+                System.out.println("TRANSFER TICKET QUERY: " + updateTicketTableSqlStm);
+                totalUpdate += updateTicketTableSqlStm.executeUpdate();
+                //extract event_id of ticket
+//                //change Transaction type
+                String selectTicketEventIdSql = "SELECT event_id FROM tickets_list WHERE ticket_id = ?;";
+                PreparedStatement selectTicketEventIdSqlStm = connection.prepareStatement(selectTicketEventIdSql);
+                System.out.println("2eachTicketId : " + eachTicketId);
+                selectTicketEventIdSqlStm.setInt(1, eachTicketId);
+                System.out.println("3eachTicketId : " + eachTicketId);
+                System.out.println("Getting emailId QUERY:" + selectTicketEventIdSqlStm);
+                ResultSet resultSet = selectTicketEventIdSqlStm.executeQuery();
+                if (resultSet.next()) {
+                    int eventId = resultSet.getInt("event_id");
+                    Transaction transaction = new Transaction(LoginServerConstants.TRANSACTION_TYPE_TRANSFERRED, ticketTransfer.getTransferor(), eventId);
+                    transaction.setTransactionDetail(generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_TRANSFERRED));
+                    boolean transactionSuccessful = insertIntoTransactionTable(transaction);
+                    transaction.setTransactionType(LoginServerConstants.TRANSACTION_TYPE_RECEIVED);
+                    transaction.setUserEmailId(ticketTransfer.getTransferee());
+                    transaction.setTransactionDetail(generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_RECEIVED));
+                    transactionSuccessful = insertIntoTransactionTable(transaction);
+                }
+            }
+            if (totalUpdate == ticketTransfer.getTicketIdList().size()) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+//    public static int getEventIdOfTicketId(int ticketId) {
+//        //acquire ticket table read lock
+//    }
 
 
-
+    /**
+     * all transaction belonging to a user including purchase transfer & received.
+     * @param userId
+     * @return
+     * @throws SQLException
+     */
+    public static List<Transaction> allTransactionOfUser(String userId) throws SQLException {
+        //acquire tickets-table read lock and Event read lock
+        String selectUserTransaction = "SELECT transaction_id, transaction_type, event_id, transaction_date, transaction_details FROM transactions WHERE user_email_id = ?;";
+        try (Connection connection = DBCPDataSource.getConnection()) {
+            PreparedStatement selectUserTransactionStm = connection.prepareStatement(selectUserTransaction);
+            selectUserTransactionStm.setString(1, userId);
+            System.out.println("selectUpcomingEventsSql Prepared Statement : " + selectUserTransactionStm);
+            ResultSet resultSet = selectUserTransactionStm.executeQuery();
+            List<Transaction> transactionList = new ArrayList<>();
+            while (resultSet.next()) {
+                Transaction transaction = new Transaction();
+                transaction.setTransactionId(resultSet.getInt("transaction_id"));
+                transaction.setTransactionType(resultSet.getString("transaction_type"));
+                transaction.setEventId(resultSet.getInt("event_id"));
+                transaction.setTransactionDate(resultSet.getString("transaction_date"));
+                transaction.setTransactionDetail(resultSet.getString("transaction_details"));
+                transactionList.add(transaction);
+            }
+            return transactionList;
+        }
+    }
 
 
 
