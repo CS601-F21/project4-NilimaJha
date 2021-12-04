@@ -42,4 +42,10 @@ public class LoginServerConstants {
     public static final String EMAIL_KEY = "email";
     public static final String ACCESS_TOKEN_KEY = "access_token";
 
+    public static final String TRANSACTION_TYPE_PURCHASED = "Purchased";
+    public static final String TRANSACTION_TYPE_TRANSFERRED = "Transferred";
+    public static final String TRANSACTION_TYPE_RECEIVED = "Received";
+
+
+
 }
