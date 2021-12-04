@@ -1,9 +1,9 @@
 package model;
 
 public class EventSearchKeyValue {
-    String searchCategory;
-    String searchType;
-    String searchTerm;
+    private String searchCategory;
+    private String searchType;
+    private String searchTerm;
 
     public EventSearchKeyValue() {
     }
