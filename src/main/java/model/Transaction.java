@@ -1,63 +1,76 @@
 package model;
 
 public class Transaction {
-    private int transaction_id;
-    private char transaction_type;
-    private String user_email_id;
-    private int event_id;
-    private String transaction_date;
+    private int transactionId;
+    private String transactionType;
+    private String userEmailId;
+    private int eventId;
+    private String transactionDate;
+    private String transactionDetail;
 
-    public Transaction(char transaction_type, String user_email_id, int event_id) {
-        this.transaction_type = transaction_type;
-        this.user_email_id = user_email_id;
-        this.event_id = event_id;
+    public Transaction() {
+
     }
 
-    public Transaction(int transaction_id, char transaction_type, String user_email_id, int event_id, String transaction_date) {
-        this.transaction_id = transaction_id;
-        this.transaction_type = transaction_type;
-        this.user_email_id = user_email_id;
-        this.event_id = event_id;
-        this.transaction_date = transaction_date;
+    public Transaction(String transactionType, String userEmailId, int eventId) {
+        this.transactionType = transactionType;
+        this.userEmailId = userEmailId;
+        this.eventId = eventId;
     }
 
-    public int getTransaction_id() {
-        return transaction_id;
+    public Transaction(int transactionId, String transactionType, String userEmailId, int eventId, String transactionDate) {
+        this.transactionId = transactionId;
+        this.transactionType = transactionType;
+        this.userEmailId = userEmailId;
+        this.eventId = eventId;
+        this.transactionDate = transactionDate;
     }
 
-    public char getTransaction_type() {
-        return transaction_type;
+    public int getTransactionId() {
+        return transactionId;
     }
 
-    public String getUser_email_id() {
-        return user_email_id;
+    public String getTransactionType() {
+        return transactionType;
     }
 
-    public int getEvent_id() {
-        return event_id;
+    public String getUserEmailId() {
+        return userEmailId;
     }
 
-    public String getTransaction_date() {
-        return transaction_date;
+    public int getEventId() {
+        return eventId;
     }
 
-    public void setTransaction_id(int transaction_id) {
-        this.transaction_id = transaction_id;
+    public String getTransactionDate() {
+        return transactionDate;
     }
 
-    public void setTransaction_type(char transaction_type) {
-        this.transaction_type = transaction_type;
+    public String getTransactionDetail() {
+        return transactionDetail;
     }
 
-    public void setUser_email_id(String user_email_id) {
-        this.user_email_id = user_email_id;
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
     }
 
-    public void setEvent_id(int event_id) {
-        this.event_id = event_id;
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
     }
 
-    public void setTransaction_date(String transaction_date) {
-        this.transaction_date = transaction_date;
+    public void setUserEmailId(String userEmailId) {
+        this.userEmailId = userEmailId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
+
+    public void setTransactionDate(String transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public void setTransactionDetail(String transactionDetail) {
+        this.transactionDetail = transactionDetail;
     }
 }
