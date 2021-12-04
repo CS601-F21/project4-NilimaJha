@@ -1,6 +1,5 @@
 package web.login;
 
-import jdbc.DBCPDataSource;
 import jdbc.JDBCConnectionPool;
 import model.User;
 import model.UserUpcomingEvent;
@@ -13,17 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import web.HttpServer;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import static jdbc.JDBCConnectionPool.updateUserInfoTable;
-
-//import static jdbc.JDBCConnectionPool.executeSelectFromUserInfoWhere;
 
 @Controller
 public class LoginController {
@@ -53,6 +47,7 @@ public class LoginController {
 
     @GetMapping("/home")
     protected String home(HttpServletRequest req, Model model) throws IOException {
+        System.out.println("Inside /home");
         // retrieve the ID of this session
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
@@ -63,6 +58,7 @@ public class LoginController {
             List<UserUpcomingEvent> userUpcomingEventList = null;
             try {
                 user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                System.out.println("User From Db : " + user.getUserName());
                 userUpcomingEventList = JDBCConnectionPool.allUpcomingEvents(user.getUserEmailId());
                 System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 System.out.println("USER INFO");
@@ -111,19 +107,32 @@ public class LoginController {
                 // Make the request to the token API
                 String responseString = HTTPFetcher.doGet(url, null);
                 Map<String, Object> response = LoginUtilities.jsonStrToMap(responseString);
+                System.out.println("JJJJJJJJJJJJJJJJJJJJJJJJJJ ");
                 User user = LoginUtilities.verifyTokenResponse(response, sessionId);
+                System.out.println("User object formed after verifying data obtained from slack ");
                 if (user == null) {
                     return "loginUnsuccessful";
                 } else {
                     req.getSession().setAttribute("emailId", user.getUserEmailId());
                     try {
                         User userFromDB = JDBCConnectionPool.findUserFromUserInfoByEmailId(user.getUserEmailId());
+                        System.out.println("Getting user from db");
+                        System.out.println("IS user obtained from db is valid :" + userFromDB.isValid());
                         if (!userFromDB.isValid()) {
                             JDBCConnectionPool.executeInsertInUserInfo(user);
                             model.addAttribute("user", user);
                             return "completeProfile";
                         } else {
-                            model.addAttribute("userName", userFromDB.getUserName());
+                            List<UserUpcomingEvent> userUpcomingEventList = null;
+                            try {
+                                userUpcomingEventList = JDBCConnectionPool.allUpcomingEvents(user.getUserEmailId());
+                            } catch(SQLException e) {
+                                e.printStackTrace();
+                            }
+                            String tableCaption = "Upcoming Events";
+                            model.addAttribute("tableCaption", tableCaption);
+                            model.addAttribute("user", userFromDB);
+                            model.addAttribute("upcomingEventList", userUpcomingEventList);
                         }
                     } catch (SQLException e) {
                         e.printStackTrace();
