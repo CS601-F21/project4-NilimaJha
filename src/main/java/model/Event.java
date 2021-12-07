@@ -1,14 +1,25 @@
 package model;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import javax.validation.constraints.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
+/**
+ * stores event related data to be stored into and extract from database table named events.
+ * It contains following attributes :-
+ * eventId            : id of the event.
+ * eventName          : event name.
+ * eventOrganizerId   : event organizer/creator email id.
+ * eventOrganizerName : event organizer name.
+ * eventDate          : date of event.
+ * eventLocation      : location of event.
+ * eventCategories    : category of event
+ * eventDescription   : description of event.
+ *
+ * @author nilimajha
+ */
 public class Event {
+
     private int eventId;
     @NotEmpty
     @NotNull
@@ -23,24 +34,37 @@ public class Event {
     private String eventCategories;
     @NotEmpty (message = "Wrong event Description")
     private String eventDescription;
-    
     @Digits(integer = 4, fraction = 0 ,message = "wrong total ticket")
     private int totalTickets;
     private int ticketsAvailable;
     private String eventStatus;
     private String eventCreatedOn;
 
+    /**
+     * empty constructor.
+     */
     public Event() {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd-yy");
-        LocalDateTime now = LocalDateTime.now();
-        this.eventCreatedOn = dtf.format(now);
-        this.eventStatus = "active";
-        System.out.println("Date :" + this.eventCreatedOn);
     }
 
-    public Event(int eventId, String eventName, String eventDate, String eventOrganizerName, String eventLocation,
-                  String eventCategories, String eventDescription,
-                 int totalTickets, int ticketsAvailable, String eventStatus, String eventCreatedOn) {
+    /**
+     * Constructor to initialise all the attributes of the class.
+     * @param eventId
+     * @param eventName
+     * @param eventDate
+     * @param eventOrganizerName
+     * @param eventLocation
+     * @param eventCategories
+     * @param eventDescription
+     * @param totalTickets
+     * @param ticketsAvailable
+     * @param eventStatus
+     * @param eventCreatedOn
+     */
+    public Event(int eventId, String eventName, String eventDate,
+                 String eventOrganizerName, String eventLocation,
+                 String eventCategories, String eventDescription,
+                 int totalTickets, int ticketsAvailable,
+                 String eventStatus, String eventCreatedOn) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventDate = eventDate;
@@ -55,6 +79,11 @@ public class Event {
 
     }
 
+    /**
+     * constructor that initialises the event class object attribute using result data obtained from database.
+     * @param rs
+     * @throws SQLException
+     */
     public Event(ResultSet rs) throws SQLException {
         if (rs.next()) {
             if (!rs.wasNull()) {
@@ -107,98 +136,194 @@ public class Event {
 
     }
 
+    /**
+     * getter for class attribute eventId.
+     * @return eventId
+     */
     public int getEventId() {
         return eventId;
     }
 
+    /**
+     * getter for class attribute eventName.
+     * @return eventName
+     */
     public String getEventName() {
         return eventName;
     }
 
+    /**
+     * getter for class attribute eventOrganizerId.
+     * @return eventOrganizerId
+     */
     public String getEventOrganizerId() {
         return eventOrganizerId;
     }
 
+    /**
+     * getter for class attribute eventOrganizerName.
+     * @return eventOrganizerName
+     */
     public String getEventOrganizerName() {
         return eventOrganizerName;
     }
 
+    /**
+     * getter for class attribute eventDate.
+     * @return eventDate
+     */
     public String getEventDate() {
         return eventDate;
     }
 
+    /**
+     * getter for class attribute eventLocation.
+     * @return eventLocation
+     */
     public String getEventLocation() {
         return eventLocation;
     }
 
+    /**
+     * getter for class attribute eventCategories.
+     * @return eventCategories
+     */
     public String getEventCategories() {
         return eventCategories;
     }
 
+    /**
+     * getter for class attribute eventDescription.
+     * @return eventDescription
+     */
     public String getEventDescription() {
         return eventDescription;
     }
 
+    /**
+     * getter for class attribute totalTickets.
+     * @return totalTickets
+     */
     public int getTotalTickets() {
         return totalTickets;
     }
 
+    /**
+     * getter for class attribute ticketsAvailable.
+     * @return ticketsAvailable
+     */
     public int getTicketsAvailable() {
         return ticketsAvailable;
     }
 
+    /**
+     * getter for class attribute eventStatus.
+     * @return eventStatus
+     */
     public String getEventStatus() {
         return eventStatus;
     }
 
+    /**
+     * getter for class attribute eventCreatedOn.
+     * @return eventCreatedOn
+     */
     public String getEventCreatedOn() {
         return eventCreatedOn;
     }
 
+    /**
+     * setter for class attribute eventId.
+     * @return eventId
+     */
     public void setEventId(int eventId) {
         this.eventId = eventId;
     }
 
+    /**
+     * setter for class attribute eventName.
+     * @return eventName
+     */
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
 
+    /**
+     * setter for class attribute eventOrganizer.
+     * @return eventOrganizer
+     */
     public void setEventOrganizerId(String eventOrganizer) {
         this.eventOrganizerId = eventOrganizer;
     }
 
+    /**
+     * setter for class attribute eventOrganizerName.
+     * @return eventOrganizerName
+     */
     public void setEventOrganizerName(String eventOrganizerName) {
         this.eventOrganizerName = eventOrganizerName;
     }
 
+    /**
+     * setter for class attribute eventDate.
+     * @return eventDate
+     */
     public void setEventDate(String eventDate) {
         this.eventDate = eventDate;
     }
 
+    /**
+     * setter for class attribute eventLocation.
+     * @return eventLocation
+     */
     public void setEventLocation(String eventLocation) {
         this.eventLocation = eventLocation;
     }
 
+    /**
+     * setter for class attribute eventCategories.
+     * @return eventCategories
+     */
     public void setEventCategories(String eventCategories) {
         this.eventCategories = eventCategories;
     }
 
+    /**
+     * setter for class attribute eventDescription.
+     * @return eventDescription
+     */
     public void setEventDescription(String eventDescription) {
         this.eventDescription = eventDescription;
     }
 
+    /**
+     * setter for class attribute totalTickets.
+     * @return totalTickets
+     */
     public void setTotalTickets(int totalTickets) {
         this.totalTickets = totalTickets;
     }
 
+    /**
+     * setter for class attribute ticketsAvailable.
+     * @return ticketsAvailable
+     */
     public void setTicketsAvailable(int ticketsAvailable) {
         this.ticketsAvailable = ticketsAvailable;
     }
 
+    /**
+     * setter for class attribute eventStatus.
+     * @return eventStatus
+     */
     public void setEventStatus(String eventStatus) {
         this.eventStatus = eventStatus;
     }
 
+    /**
+     * setter for class attribute eventCreatedOn.
+     * @return eventCreatedOn
+     */
     public void setEventCreatedOn(String eventCreatedOn) {
         this.eventCreatedOn = eventCreatedOn;
     }
