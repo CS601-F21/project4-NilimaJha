@@ -1,13 +1,15 @@
 package utils;
 
 import com.google.gson.Gson;
-import jdbc.JDBCConnectionPool;
 import model.User;
 import web.login.LoginServerConstants;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+
+import static jdbc.JDBCUserTableOperations.findUserFromUserInfoByEmailId;
 
 /**
  * A utility class.
@@ -39,7 +41,7 @@ public class Utilities {
     public static boolean isUserProfileComplete(String emailId) {
         User user = null;
         try {
-            user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+            user = findUserFromUserInfoByEmailId(emailId);
         } catch(SQLException e) {
             e.printStackTrace();
             return false;
@@ -48,5 +50,17 @@ public class Utilities {
             return true;
         }
         return false;
+    }
+
+    public static boolean presentOrFutureDate(String date) {
+        LocalDateTime inputDateTime = LocalDateTime.parse(date+"T00:00:00.000");
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        // comparing date provided by user with the current date.
+        if (inputDateTime.isBefore(currentDateTime)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }
