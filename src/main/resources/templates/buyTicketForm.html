@@ -9,7 +9,7 @@
     </head>
     <body>
         <header>
-            <h1 style="color: navy;" class=""><center><u>Event's Detail<br/></u></center></h1>
+            <h1 style="color: navy;" class=""><center><u>Buy Ticket<br/></u></center></h1>
             <nav>
                 <ul class="nav justify-content-end">
                     <li class="nav-item">
@@ -19,12 +19,14 @@
             </nav>
             <hr/>
         </header>
-        <main th:object="${event}">
+        <main>
             <div>
                 <a class="btn btn-primary" href="/home" role="button">Home</a>
                 <a class="btn btn-primary" href="/events" role="button">All Active Events</a>
             </div>
             <hr/>
+        </main>
+        <span th:object="${event}">
             <table class="table table-borderless">
                 <tr>
                     <td><b>Event Id:- </b></td>
@@ -35,14 +37,6 @@
                     <td><span th:text="*{eventName}"></span></td>
                 </tr>
                 <tr>
-                    <td><b>Event Organizer Name:- </b></td>
-                    <td><span th:text="*{eventOrganizerName}"></span></td>
-                </tr>
-                <tr>
-                    <td><b>Event Organizer ID:- </b></td>
-                    <td><span th:text="*{eventOrganizerId}"></span></td>
-                </tr>
-                <tr>
                     <td><b>Event's Date:- </b></td>
                     <td><span th:text="*{eventDate}"></span></td>
                 </tr>
@@ -51,32 +45,30 @@
                     <td><span th:text="*{eventLocation}"></span></td>
                 </tr>
                 <tr>
-                    <td><b>Event's Category:- </b></td>
-                    <td><span th:text="*{eventCategories}"></span></td>
-                </tr>
-                <tr>
                     <td><b>Event's Description:- </b></td>
                     <td><span th:text="*{eventDescription}"></span></td>
-                </tr>
-                <tr>
-                    <td><b>Total Tickets:- </b></td>
-                    <td><span th:text="*{totalTickets}"></span></td>
                 </tr>
                 <tr>
                     <td><b>Total Available Tickets:- </b></td>
                     <td><span th:text="*{ticketsAvailable}"></span></td>
                 </tr>
-                <tr>
-                    <td><b>Event Created On:- </b></td>
-                    <td><span th:text="*{eventCreatedOn}"></span></td>
-                </tr>
             </table>
-            <hr/>
-            <div th:if="*{isActive}">
-                <div th:if="*{ticketsAvailable} > 0">
-                    <a class="btn btn-primary" th:href="@{'/buyEventTicket/' + *{eventId}}" role="button">Buy Ticket</a>
+<!--            /event/{eventId}/buyTicket/{totalTickets}-->
+            <form class="form-horizontal" method="post" th:action="@{/event/{eventId}/ticketCount/(eventId=${event.eventId})}" th:object="${tickets}">
+                <div class="form-group row">
+                    <label class="col-sm-8 col-form-label" for="totalTicketsSelected"><b>Please Select Total Number Of Tickets You Want To Buy:</b></label>
+                    <div class="col-sm-2">
+                        <input type="number" min="1" th:max="${event.ticketsAvailable}" class="form-control" id="totalTicketsSelected" th:field="*{totalTicketsSelected}" placeholder="Enter Total Tickets" required>
+                    </div>
                 </div>
-            </div>
-        </main>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <br/>
+                        <button type="submit" class="btn btn-primary">Place Order</button>
+                    </div>
+                </div>
+            </form>
+            <hr/>
+        </span>
     </body>
 </html>
