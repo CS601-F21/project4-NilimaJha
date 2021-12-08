@@ -1,7 +1,6 @@
 package web.userProfile;
 
-import jdbc.DBCPDataSource;
-import jdbc.JDBCConnectionPool;
+import jdbc.JDBCUserTableOperations;
 import model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,11 +12,10 @@ import utils.Utilities;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 
-import static jdbc.JDBCConnectionPool.updateUserInfoTable;
+import static jdbc.JDBCEventTableOperations.findEventsByOrganizerId;
+import static jdbc.JDBCUserTableOperations.*;
 
 /**
  * Controller class that handles request related to user like
@@ -33,8 +31,18 @@ import static jdbc.JDBCConnectionPool.updateUserInfoTable;
 @Controller
 public class UserController {
 
+    /**
+     * handles GET request with path /viewProfile
+     * It first checks if the user is logged in, then
+     * if the user's profile is completed and
+     * if the above two condition is correct then it shows user profile information.
+     *
+     * @param req
+     * @param model
+     * @return completeProfile page or viewProfile page or redirect path
+     */
     @GetMapping("/viewProfile")
-    protected String viewProfile (HttpServletRequest req, Model model) throws IOException {
+    protected String viewProfile (HttpServletRequest req, Model model) {
         // retrieve the ID of this session
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
@@ -45,7 +53,7 @@ public class UserController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -53,9 +61,9 @@ public class UserController {
                 return "completeProfile";
             } else {
                 User user = null;
-                try (Connection connection = DBCPDataSource.getConnection()) {
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
-                    int totalEventsCreated = JDBCConnectionPool.findEventsByOrganizerId(emailId).size();
+                try {
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
+                    int totalEventsCreated = findEventsByOrganizerId(emailId).size();
                     model.addAttribute("user", user);
                     model.addAttribute("totalEventsCreated", totalEventsCreated);
                     //extract total number of events created by the user from events table.
@@ -69,6 +77,17 @@ public class UserController {
         }
     }
 
+    /**
+     * handles GET request with path /updateProfile
+     * It first checks if the user is logged in, then
+     * if the user's profile is completed and
+     * if the above two condition is correct,
+     * it will return a form from where user can update profile information.
+     *
+     * @param req
+     * @param model
+     * @return
+     */
     @GetMapping("/updateProfile")
     protected String updateProfileShowForm(HttpServletRequest req, Model model) {
         // retrieve the ID of this session
@@ -80,7 +99,7 @@ public class UserController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwable) {
                     throwable.printStackTrace();
                 }
@@ -88,7 +107,7 @@ public class UserController {
                 return "completeProfile";
             } else {
                 try {
-                    User userFromDB = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    User userFromDB = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                     model.addAttribute("user", userFromDB);
                 } catch (SQLException throwable) {
                     throwable.printStackTrace();
@@ -100,6 +119,20 @@ public class UserController {
         }
     }
 
+    /**
+     * handles POST request with path /updateProfilePost
+     * It first checks if the user is logged in, then
+     * if the user's profile is completed and
+     * if the above two condition is correct,
+     * it will perform update operation on user information in the table
+     * and then redirect to view profile page.
+     *
+     * @param req
+     * @param user
+     * @param bindingResult
+     * @param model
+     * @return
+     */
     @PostMapping("/updateProfilePost")
     protected String updateProfileSubmit(HttpServletRequest req, @Valid @ModelAttribute("user") User user, BindingResult bindingResult, Model model) {
         // retrieve the ID of this session
@@ -112,9 +145,8 @@ public class UserController {
         if (emailId != null) {
             // already authed, no need to log in
             if (!Utilities.isUserProfileComplete(emailId)) {
-//                User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwable) {
                     throwable.printStackTrace();
                 }
@@ -122,7 +154,7 @@ public class UserController {
                 return "completeProfile";
             } else {
                 try {
-                    updateUserInfoTable(emailId, user);
+                    JDBCUserTableOperations.updateUserInfoTable(emailId, user);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

@@ -1,6 +1,7 @@
 package web.events;
 
 import jdbc.JDBCConnectionPool;
+import jdbc.JDBCUserTableOperations;
 import model.Event;
 import model.EventSearchKeyValue;
 import model.User;
@@ -20,7 +21,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jdbc.JDBCConnectionPool.executeInsertIntoEvents;
+import static jdbc.JDBCEventTableOperations.*;
 
 /**
  * Controller class that handles request related to events like
@@ -44,6 +45,9 @@ public class EventController {
 
     /**
      * handles GET on path /newEventForm
+     * validates user then returns from page where
+     * user will entered required information of the events to be created.
+     *
      * @param req
      * @param model
      * @return
@@ -59,9 +63,9 @@ public class EventController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
                 }
                 model.addAttribute("user", user);
 //                model.addAttribute("upcomingEventList", userUpcomingEventList);
@@ -78,7 +82,10 @@ public class EventController {
     }
 
     /**
-     * handles POST method on path /event
+     * handles POST method on path /createEventPost
+     * validates user then if all the information provided in the form is valid
+     * new event creation process is performed.
+     *
      * @param req
      * @param event
      * @param bindingResult
@@ -88,7 +95,8 @@ public class EventController {
     @PostMapping("/createEventPost")
     protected String createEvent(HttpServletRequest req,
                                  @Valid @ModelAttribute("event") Event event,
-                                 BindingResult bindingResult, Model model) {
+                                 BindingResult bindingResult,
+                                 Model model) {
 
         // retrieve the ID of this session
         String sessionId = req.getSession(true).getId();
@@ -102,7 +110,7 @@ public class EventController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwable) {
                     throwable.printStackTrace();
                 }
@@ -126,7 +134,9 @@ public class EventController {
 
     /**
      * handles GET on path /events
-     * and returns a web page containing information of all the upcoming events.
+     * validates user and then
+     * returns a web page containing information of all the upcoming events.
+     *
      * @param req
      * @param model
      * @return
@@ -142,7 +152,7 @@ public class EventController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwable) {
                     throwable.printStackTrace();
                 }
@@ -151,7 +161,7 @@ public class EventController {
             } else {
                 List<Event> eventList = null;
                 try {
-                    eventList = JDBCConnectionPool.findEventsFromEventsTable();
+                    eventList = findEventsFromEventsTable();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -170,7 +180,9 @@ public class EventController {
 
     /**
      * handles GET on path /event/{eventId}
-     * and returns specific event's details in a html page.
+     * validates user and then returns
+     * specific event's details in a html page.
+     *
      * @param req
      * @param eventId
      * @param model
@@ -187,7 +199,7 @@ public class EventController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -198,7 +210,7 @@ public class EventController {
                 Event event = new Event();
                 // already authed, no need to log in
                 try {
-                    event = JDBCConnectionPool.findEventByEventIdFromEventsTable(eventId);
+                    event = findEventByEventIdFromEventsTable(eventId);
                 } catch (SQLException throwable) {
                     throwable.printStackTrace();
                 }
@@ -213,7 +225,9 @@ public class EventController {
 
     /**
      * handles GET on path /eventSearchForm
-     * it returns a html page containing form for find event.
+     * validates user, and then
+     * returns a html page containing form for find event.
+     *
      * @param req
      * @param model
      * @return
@@ -228,7 +242,7 @@ public class EventController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -246,9 +260,10 @@ public class EventController {
     }
 
     /**
+     * (/eventSearchResult)
+     * handles GET request on path /eventsByResult
+     * validates user and then returns search result in a html page.
      *
-     * 1
-     * handles GET request on path /eventSearchResult
      * @param req
      * @param eventSearchKeyValue
      * @param model
@@ -265,7 +280,7 @@ public class EventController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
@@ -294,6 +309,15 @@ public class EventController {
         }
     }
 
+    /**
+     * handles GET request on path /events/{userId}
+     * validates user and then returns that users all events.i.e.
+     * the events created by that user.
+     * @param req
+     * @param userId
+     * @param model
+     * @return
+     */
     @GetMapping("/events/{userId}")
     protected String findYourEvents(HttpServletRequest req, @PathVariable("userId") String userId, Model model) {
         // retrieve the ID of this session
@@ -305,16 +329,16 @@ public class EventController {
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
-                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
                 }
                 model.addAttribute("user", user);
                 return "completeProfile";
             } else {
                 List<Event> eventList = null;
                 try {
-                    eventList = JDBCConnectionPool.findEventsByEventCreatorFromEventsTable(userId);
+                    eventList = findEventsByOrganizerId(userId);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
