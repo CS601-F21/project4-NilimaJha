@@ -156,7 +156,9 @@ public class LoginUtilities {
         // Decoding process taken from:
         // https://www.baeldung.com/java-jwt-token-decode
         String[] chunks = idToken.split("\\.");
+        System.out.println("Idtoken: " + idToken);
         Base64.Decoder decoder = Base64.getDecoder();
+        System.out.println(chunks[1]);
 
         String header = new String(decoder.decode(chunks[0]));
         String payload = new String(decoder.decode(chunks[1]));
