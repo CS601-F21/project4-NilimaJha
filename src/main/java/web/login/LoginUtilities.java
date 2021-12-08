@@ -10,15 +10,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-
+/**
+ * Class containing utility functions required for login via slack.
+ *
+ * @author nilimajha
+ */
 public class LoginUtilities {
     // for parsing JSON
     private static final Gson gson = new Gson();
 
     /**
-     * Hash the session ID to generate a nonce.
-     * Uses Apache Commons Codec
-     * See https://www.baeldung.com/sha-256-hashing-java
+     * Hashes the session ID to generate a nonce.
+     *
      * @param sessionId
      * @return
      */
@@ -28,7 +31,7 @@ public class LoginUtilities {
     }
 
     /**
-     * Generates the URL to make the initial request to the authorize API.
+     * Generates the URL to make the initial request to the slack's authorize API.
      * @param clientId
      * @param state
      * @param nonce
@@ -36,7 +39,6 @@ public class LoginUtilities {
      * @return
      */
     public static String generateSlackAuthorizeURL(String clientId, String state, String nonce, String redirectURI) {
-        System.out.println("Session ID while generating slackAuthorizedURL : " +state);
 
         String url = String.format("https://%s/%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
                 LoginServerConstants.HOST,
@@ -105,16 +107,10 @@ public class LoginUtilities {
     public static User verifyTokenResponse(Map<String, Object> map, String sessionId) {
         // verify ok: true
         if(!map.containsKey(LoginServerConstants.OK_KEY) || !(boolean)map.get(LoginServerConstants.OK_KEY)) {
-            System.out.println("tokenResponse is not valid.1");
-            System.out.println("1....Returning User = null ");
             return null;
         }
         // verify state is the users session cookie id
         if(!map.containsKey(LoginServerConstants.STATE_KEY) || !map.get(LoginServerConstants.STATE_KEY).equals(sessionId)) {
-            System.out.println(map.get(LoginServerConstants.STATE_KEY));
-            System.out.println(sessionId);
-            System.out.println("Something wrong with state.");
-            System.out.println("2....Returning User = null ");
             return null;
         }
         // retrieve and decode id_token
@@ -124,20 +120,13 @@ public class LoginUtilities {
         String expectedNonce = generateNonce(sessionId);
         String actualNonce = (String) payloadMap.get(LoginServerConstants.NONCE_KEY);
         if(!expectedNonce.equals(actualNonce)) {
-            System.out.println("Something wrong with nouns.");
-            System.out.println("3....Returning User = null ");
             return null;
         }
         // extract name from response
         Set<String> set = payloadMap.keySet();
-        Iterator iter = set.iterator();
-        while (iter.hasNext()) {
-            System.out.println("#####" + iter.next());
-        }
         String userName = (String) payloadMap.get(LoginServerConstants.NAME_KEY);
         String userEmailId = (String) payloadMap.get(LoginServerConstants.EMAIL_KEY);
         String userAccessToken = (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY);
-        System.out.println("4.......Returning valid user...");
         return new User(userEmailId, userName, userAccessToken);
     }
 

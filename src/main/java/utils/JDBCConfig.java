@@ -2,6 +2,7 @@ package utils;
 
 /**
  * A class to store the properties of the JSON configuration file.
+ * @author nilimajha
  */
 public class JDBCConfig {
 
@@ -22,7 +23,7 @@ public class JDBCConfig {
     }
 
     /**
-     * Return the database property.
+     * Getter for class attribute named database.
      * @return
      */
     public String getDatabase() {
@@ -30,7 +31,7 @@ public class JDBCConfig {
     }
 
     /**
-     * Return the username property.
+     * Getter for class attribute named username.
      * @return
      */
     public String getUsername() {
@@ -38,7 +39,7 @@ public class JDBCConfig {
     }
 
     /**
-     * Return the password property.
+     * Getter for class attribute named password.
      * @return
      */
     public String getPassword() {

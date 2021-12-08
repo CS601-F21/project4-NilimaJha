@@ -83,6 +83,7 @@ public class HTTPFetcher {
      * @return
      */
     private static HttpRequest.Builder setHeaders(HttpRequest.Builder builder, Map<String, String> headers) {
+
         if(headers != null) {
             for (String key : headers.keySet()) {
                 builder = builder.setHeader(key, headers.get(key));
