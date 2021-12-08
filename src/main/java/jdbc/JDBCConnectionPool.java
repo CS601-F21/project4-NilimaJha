@@ -49,6 +49,7 @@ public class JDBCConnectionPool {
         }
     }
 
+
     /**
      * A method to perform select from userInfo table where user_email_id matches the given email_id.
      * A PrepareStatement is used to execute this query.
@@ -100,8 +101,8 @@ public class JDBCConnectionPool {
         String createNewEventSql = "INSERT INTO events " +
                 "(event_name, event_organizer, event_date, " +
                 "event_location, event_categories, event_description, " +
-                "total_tickets, tickets_available, event_status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                "total_tickets, tickets_available) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         try (Connection connection = DBCPDataSource.getConnection()) {
             PreparedStatement createNewEventStm = connection.prepareStatement(createNewEventSql);
             createNewEventStm.setString(1, event.getEventName());
@@ -112,7 +113,7 @@ public class JDBCConnectionPool {
             createNewEventStm.setString(6, event.getEventDescription());
             createNewEventStm.setInt(7, event.getTotalTickets());
             createNewEventStm.setInt(8, event.getTotalTickets());
-            createNewEventStm.setString(9, event.getEventStatus());
+//            createNewEventStm.setString(9, "active");
             createNewEventStm.executeUpdate();
         }
         System.out.println("1 event inserted into db.");
@@ -135,6 +136,27 @@ public class JDBCConnectionPool {
         }
         return eventList;
     }
+
+    /**
+     * A method to perform select from userInfo table where user_email_id matches the given email_id.
+     * A PrepareStatement is used to execute this query.
+     * @throws SQLException
+     */
+    public static List<Event> findEventsByOrganizerId (String eventOrganizer) throws SQLException {
+        //read-userInfoTableLock on usersInfo table
+        List<Event> eventList = new ArrayList<>();
+        try (Connection connection = DBCPDataSource.getConnection()) {
+            String selectEventInfoSql = "SELECT * FROM events WHERE event_organizer = ?;";
+            PreparedStatement selectEventInfoSqlStmt = connection.prepareStatement(selectEventInfoSql);
+            selectEventInfoSqlStmt.setString(1, eventOrganizer);
+            System.out.println("Query on usersInfo: " + selectEventInfoSqlStmt);
+            ResultSet resultSet = selectEventInfoSqlStmt.executeQuery();
+            eventList = listOfObjFromResultSet(resultSet);
+        }
+        return eventList;
+    }
+
+
 
     /**
      * A method to perform select from userInfo table where user_email_id matches the given email_id.
@@ -258,7 +280,7 @@ public class JDBCConnectionPool {
                     resultSet.getString("event_description"),
                     resultSet.getInt("total_tickets"),
                     resultSet.getInt("tickets_available"),
-                    resultSet.getString("event_status"),
+//                    resultSet.getString("event_status"),
                     resultSet.getString("created_on"));
             eventList.add(event);
         }
@@ -413,50 +435,50 @@ public class JDBCConnectionPool {
         LocalDateTime now = LocalDateTime.now();
         String currentDate = dtf.format(now);
         System.out.println("Date :" + currentDate);
-        //
-        String updateTicketTableSql = "UPDATE tickets_list SET ticket_owner_id = ?, purchase_date = ? WHERE ticket_id = ?;";
-        try (Connection connection = DBCPDataSource.getConnection()) {
-            PreparedStatement updateTicketTableSqlStm = connection.prepareStatement(updateTicketTableSql);
-            updateTicketTableSqlStm.setString(1, ticketTransfer.getTransferee());
-            updateTicketTableSqlStm.setString(2, currentDate);
-            int totalUpdate = 0;
-            for (int eachTicketId : ticketTransfer.getTicketIdList()) {
-                updateTicketTableSqlStm.setInt(3, eachTicketId);
-                System.out.println("1eachTicketId : " + eachTicketId);
-                System.out.println("TRANSFER TICKET QUERY: " + updateTicketTableSqlStm);
-                totalUpdate += updateTicketTableSqlStm.executeUpdate();
-                //extract event_id of ticket
+        //validate if transferee is not a valid user.
+//        User user = findUserFromUserInfoByEmailId(ticketTransfer.getTransferee());
+//        if (!user.isValid()) {
+//            return false;
+//        } else {
+            String updateTicketTableSql = "UPDATE tickets_list SET ticket_owner_id = ?, purchase_date = ? WHERE ticket_id = ?;";
+            try (Connection connection = DBCPDataSource.getConnection()) {
+                PreparedStatement updateTicketTableSqlStm = connection.prepareStatement(updateTicketTableSql);
+                updateTicketTableSqlStm.setString(1, ticketTransfer.getTransferee());
+                updateTicketTableSqlStm.setString(2, currentDate);
+                int totalUpdate = 0;
+                for (int eachTicketId : ticketTransfer.getTicketIdList()) {
+                    updateTicketTableSqlStm.setInt(3, eachTicketId);
+                    System.out.println("1eachTicketId : " + eachTicketId);
+                    System.out.println("TRANSFER TICKET QUERY: " + updateTicketTableSqlStm);
+                    totalUpdate += updateTicketTableSqlStm.executeUpdate();
+                    //extract event_id of ticket
 //                //change Transaction type
-                String selectTicketEventIdSql = "SELECT event_id FROM tickets_list WHERE ticket_id = ?;";
-                PreparedStatement selectTicketEventIdSqlStm = connection.prepareStatement(selectTicketEventIdSql);
-                System.out.println("2eachTicketId : " + eachTicketId);
-                selectTicketEventIdSqlStm.setInt(1, eachTicketId);
-                System.out.println("3eachTicketId : " + eachTicketId);
-                System.out.println("Getting emailId QUERY:" + selectTicketEventIdSqlStm);
-                ResultSet resultSet = selectTicketEventIdSqlStm.executeQuery();
-                if (resultSet.next()) {
-                    int eventId = resultSet.getInt("event_id");
-                    Transaction transaction = new Transaction(LoginServerConstants.TRANSACTION_TYPE_TRANSFERRED, ticketTransfer.getTransferor(), eventId);
-                    transaction.setTransactionDetail(generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_TRANSFERRED));
-                    boolean transactionSuccessful = insertIntoTransactionTable(transaction);
-                    transaction.setTransactionType(LoginServerConstants.TRANSACTION_TYPE_RECEIVED);
-                    transaction.setUserEmailId(ticketTransfer.getTransferee());
-                    transaction.setTransactionDetail(generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_RECEIVED));
-                    transactionSuccessful = insertIntoTransactionTable(transaction);
+                    String selectTicketEventIdSql = "SELECT event_id FROM tickets_list WHERE ticket_id = ?;";
+                    PreparedStatement selectTicketEventIdSqlStm = connection.prepareStatement(selectTicketEventIdSql);
+                    System.out.println("2eachTicketId : " + eachTicketId);
+                    selectTicketEventIdSqlStm.setInt(1, eachTicketId);
+                    System.out.println("3eachTicketId : " + eachTicketId);
+                    System.out.println("Getting emailId QUERY:" + selectTicketEventIdSqlStm);
+                    ResultSet resultSet = selectTicketEventIdSqlStm.executeQuery();
+                    if (resultSet.next()) {
+                        int eventId = resultSet.getInt("event_id");
+                        Transaction transaction = new Transaction(LoginServerConstants.TRANSACTION_TYPE_TRANSFERRED, ticketTransfer.getTransferor(), eventId);
+                        transaction.setTransactionDetail(generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_TRANSFERRED));
+                        boolean transactionSuccessful = insertIntoTransactionTable(transaction);
+                        transaction.setTransactionType(LoginServerConstants.TRANSACTION_TYPE_RECEIVED);
+                        transaction.setUserEmailId(ticketTransfer.getTransferee());
+                        transaction.setTransactionDetail(generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_RECEIVED));
+                        transactionSuccessful = insertIntoTransactionTable(transaction);
+                    }
                 }
-            }
-            if (totalUpdate == ticketTransfer.getTicketIdList().size()) {
-                return true;
-            } else {
-                return false;
-            }
+                if (totalUpdate == ticketTransfer.getTicketIdList().size()) {
+                    return true;
+                } else {
+                    return false;
+                }
+//            }
         }
     }
-
-//    public static int getEventIdOfTicketId(int ticketId) {
-//        //acquire ticket table read lock
-//    }
-
 
     /**
      * all transaction belonging to a user including purchase transfer & received.
@@ -486,37 +508,6 @@ public class JDBCConnectionPool {
         }
     }
 
-
-
-    /**
-     * A method to demonstrate using a PrepareStatement to execute a database select
-     * @param con
-     * @throws SQLException
-     */
-    public static void executeSelectAndPrint(java.sql.Connection con) throws SQLException {
-        String selectAllContactsSql = "SELECT * FROM contacts;";
-        PreparedStatement selectAllContactsStmt = con.prepareStatement(selectAllContactsSql);
-        ResultSet results = selectAllContactsStmt.executeQuery();
-        while(results.next()) {
-            System.out.printf("Name: %s\n", results.getString("name"));
-            System.out.printf("Extension: %s\n", results.getInt("extension"));
-            System.out.printf("Email: %s\n", results.getString("email"));
-            System.out.printf("Start Date: %s\n", results.getString("startdate"));
-        }
-    }
-
-    public static ResultSet executeSelectAllFromSessionInfoWhere(java.sql.Connection con, String sessionId) throws SQLException {
-        String selectAllWhereSql = "SELECT * FROM session_info WHERE session=?;";
-        PreparedStatement selectAllContactsStmt = con.prepareStatement(selectAllWhereSql);
-        selectAllContactsStmt.setString(1, sessionId);
-        ResultSet results = selectAllContactsStmt.executeQuery();
-        if (!resultSetIsEmpty(results)) {
-            return results;
-        } else {
-            return null;
-        }
-    }
-
     public static boolean resultSetIsEmpty (ResultSet results) {
         try {
             if (!results.next()) {
@@ -530,21 +521,18 @@ public class JDBCConnectionPool {
         return true;
     }
 
-    public static void executeSelectAndPrintForSession(java.sql.Connection con) throws SQLException {
-        String selectAllContactsSql = "SELECT * FROM session_info;";
-        PreparedStatement selectAllContactsStmt = con.prepareStatement(selectAllContactsSql);
-        ResultSet results = selectAllContactsStmt.executeQuery();
-        while(results.next()) {
-            System.out.printf("Session: %s\n", results.getString("session"));
-            if (results.wasNull()) {
-                System.out.printf("UserID: %s\n", null);
-            } else {
-                System.out.printf("UserID: %s\n", results.getString("userid"));
-            }
-        }
-    }
-
     public static void main(String[] args){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now);
+        String stringDate = "2022-04-07";
+        LocalDateTime inputDateTime = LocalDateTime.parse(stringDate+"T00:00:00.000");
+
+        System.out.println("inputDateTime   : " + dtf.format(inputDateTime));
+        System.out.println("CurrentDateTime : " + dtf.format(now));
+
+        boolean isBefore = inputDateTime.isBefore(now);
+        System.out.println("input: "+ dtf.format(inputDateTime) + " is Before now:" + dtf.format(now) + " ->  " + isBefore);
 
     }
 }
