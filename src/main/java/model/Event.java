@@ -7,6 +7,8 @@ import javax.validation.constraints.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static utils.Utilities.presentOrFutureDate;
+
 /**
  * stores event related data to be stored into and extract from database table named events.
  * It contains following attributes :-
@@ -47,19 +49,15 @@ public class Event {
             message = LoginServerConstants.EVENT_DESCRIPTION_ERROR_MESSAGE)
     private String eventDescription;
 
+    @Digits(integer = 4, fraction = 0 ,message = "wrong total ticket")
+    private int totalTickets;
+
     private int eventId;
     private String eventOrganizerId;
     private String eventOrganizerName;
-
-
-
-
-
-
-    @Digits(integer = 4, fraction = 0 ,message = "wrong total ticket")
-    private int totalTickets;
     private int ticketsAvailable;
     private String eventCreatedOn;
+    private boolean isActive;
 
     /**
      * empty constructor.
@@ -93,6 +91,7 @@ public class Event {
         this.totalTickets = totalTickets;
         this.ticketsAvailable = ticketsAvailable;
         this.eventCreatedOn = eventCreatedOn;
+        this.isActive = presentOrFutureDate(eventDate);
 
     }
 
@@ -143,6 +142,7 @@ public class Event {
                 this.eventCreatedOn = rs.getString("created_on");
                 System.out.println("eventCreatedOn :" + eventCreatedOn);
             }
+            this.isActive = presentOrFutureDate(eventDate);
         } else {
             System.out.println("No Event with given EventId");
         }
@@ -235,6 +235,15 @@ public class Event {
      */
     public String getEventCreatedOn() {
         return eventCreatedOn;
+    }
+
+    /**
+     * method sets the value of isActive as true or false and returns its value.
+     * @return isActive
+     */
+    public boolean isActive() {
+        this.isActive = presentOrFutureDate(this.eventDate);
+        return isActive;
     }
 
     /**
