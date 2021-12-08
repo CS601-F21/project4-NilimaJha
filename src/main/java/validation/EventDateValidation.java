@@ -4,13 +4,27 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDateTime;
 
+/**
+ * constraintValidator class for eventDate field of Event class.
+ * @author nilimajha
+ */
 public class EventDateValidation implements ConstraintValidator<EventDate, String> {
 
+    /**
+     * Initializes the validator in preparation for isValid().
+     * @param constraintAnnotation
+     */
     @Override
     public void initialize(EventDate constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
 
+    /**
+     * validate if the date entered is future date.
+     * @param date
+     * @param constraintValidatorContext
+     * @return
+     */
     @Override
     public boolean isValid(String date, ConstraintValidatorContext constraintValidatorContext) {
 
