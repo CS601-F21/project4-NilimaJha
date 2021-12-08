@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import utils.Utilities;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -18,6 +19,17 @@ import java.sql.SQLException;
 
 import static jdbc.JDBCConnectionPool.updateUserInfoTable;
 
+/**
+ * Controller class that handles request related to user like
+ * view profile
+ * update profile
+ *
+ * contains method that handles request with path
+ * - /viewProfile
+ * - /updateProfile
+ * - /updateProfilePost
+ * @author nilimajha
+ */
 @Controller
 public class UserController {
 
@@ -30,15 +42,28 @@ public class UserController {
         System.out.println(emailId);
         if (emailId != null) {
             // already authed, no need to log in
-            User user = null;
-            try (Connection connection = DBCPDataSource.getConnection()) {
-                user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+            if (!Utilities.isUserProfileComplete(emailId)) {
+                User user = new User();
+                try{
+                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
                 model.addAttribute("user", user);
-                //extract total number of events created by the user from events table.
-            } catch (SQLException e) {
-                e.printStackTrace();
+                return "completeProfile";
+            } else {
+                User user = null;
+                try (Connection connection = DBCPDataSource.getConnection()) {
+                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    int totalEventsCreated = JDBCConnectionPool.findEventsByOrganizerId(emailId).size();
+                    model.addAttribute("user", user);
+                    model.addAttribute("totalEventsCreated", totalEventsCreated);
+                    //extract total number of events created by the user from events table.
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                return "viewProfile";
             }
-            return "viewProfile";
         } else {
             return "redirect:/";
         }
@@ -52,13 +77,24 @@ public class UserController {
         String emailId = (String) req.getSession().getAttribute("emailId");
         if (emailId != null) {
             // already authed, no need to log in
-            try {
-                User userFromDB = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
-                model.addAttribute("user", userFromDB);
-            } catch (SQLException throwable) {
-                throwable.printStackTrace();
+            if (!Utilities.isUserProfileComplete(emailId)) {
+                User user = new User();
+                try{
+                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
+                }
+                model.addAttribute("user", user);
+                return "completeProfile";
+            } else {
+                try {
+                    User userFromDB = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                    model.addAttribute("user", userFromDB);
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
+                }
+                return "updateProfile";
             }
-            return "updateProfile";
         } else {
             return "redirect:/";
         }
@@ -75,12 +111,23 @@ public class UserController {
         }
         if (emailId != null) {
             // already authed, no need to log in
-            try {
-                updateUserInfoTable(emailId, user);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (!Utilities.isUserProfileComplete(emailId)) {
+//                User user = new User();
+                try{
+                    user = JDBCConnectionPool.findUserFromUserInfoByEmailId(emailId);
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
+                }
+                model.addAttribute("user", user);
+                return "completeProfile";
+            } else {
+                try {
+                    updateUserInfoTable(emailId, user);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                return "redirect:/viewProfile";
             }
-            return "redirect:/viewProfile";
         } else {
             return "redirect:/";
         }

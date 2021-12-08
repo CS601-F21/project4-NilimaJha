@@ -5,18 +5,6 @@ package web.login;
  */
 public class LoginServerConstants {
 
-    public static final String PAGE_HEADER = "<!DOCTYPE html>\n" +
-            "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-            "<head>\n" +
-            "  <title>Log in with Slack</title>\n" +
-            "</head>\n" +
-            "<body>\n" +
-            "\n";
-
-    public static final String PAGE_FOOTER = "\n" +
-            "</body>\n" +
-            "</html>";
-
     public static final String HOST = "slack.com";
     public static final String AUTH_PATH = "openid/connect/authorize";
     public static final String TOKEN_PATH = "api/openid.connect.token";
@@ -46,6 +34,26 @@ public class LoginServerConstants {
     public static final String TRANSACTION_TYPE_TRANSFERRED = "Transferred";
     public static final String TRANSACTION_TYPE_RECEIVED = "Received";
 
+    public static final String JDBC_CONFIG_FILE_NAME = "jdbcConfig.json";
+    public static final String SLACK_CONFIG_FILE_NAME = "slackConfig.json";
 
+    public static final String TICKET_TRANSFER_SUCCESS_PAGE_HEADER = "Transaction Successful!";
+    public static final String TICKET_TRANSFER_SUCCESS_PAGE_MESSAGE = "Ticket Successfully transferred!";
+
+    public static final String TICKET_TRANSFER_UNSUCCESSFUL_PAGE_HEADER = "Oops! Issue Encountered.";
+    public static final String TICKET_TRANSFER_UNSUCCESSFUL_PAGE_MESSAGE = "Ticket Transfer Failed. Please try again.";
+
+    public static final String CREATE_EVENT_SUCCESS_PAGE_HEADER = "Event Creation Successful!";
+    public static final String CREATE_EVENT_SUCCESS_PAGE_MESSAGE = "Event Successfully Created!";
+
+    public static final int EVENT_DESCRIPTION_SIZE_CONSTRAINT = 380;
+    public static final String EVENT_DESCRIPTION_ERROR_MESSAGE = "Description should be maximum of 380 character.";
+
+    public static final int EVENT_NAME_SIZE_CONSTRAINT = 100;
+    public static final String NAME_SIZE_ERROR_MESSAGE = "Name should be maximum of 100 character.";
+
+    public static final String FILED_NOT_NULL_ERROR_MESSAGE = "This field can not be null.";
+    public static final String FIELD_NOT_EMPTY_ERROR_MESSAGE = "This field can not be empty.";
+    public static final String FIELD_NOT_BLANK_ERROR_MESSAGE = "This field can not be blank.";
 
 }
