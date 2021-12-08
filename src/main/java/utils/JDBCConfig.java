@@ -4,6 +4,7 @@ package utils;
  * A class to store the properties of the JSON configuration file.
  */
 public class JDBCConfig {
+
     private String database;
     private String username;
     private String password;
