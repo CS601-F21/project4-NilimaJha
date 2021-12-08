@@ -1,5 +1,8 @@
 package model;
 
+import validation.EventDate;
+import web.login.LoginServerConstants;
+
 import javax.validation.constraints.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,24 +23,42 @@ import java.sql.SQLException;
  */
 public class Event {
 
-    private int eventId;
-    @NotEmpty
-    @NotNull
+    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotNull (message = LoginServerConstants.FILED_NOT_NULL_ERROR_MESSAGE)
+    @Size (max = LoginServerConstants.EVENT_NAME_SIZE_CONSTRAINT,
+            message = LoginServerConstants.NAME_SIZE_ERROR_MESSAGE)
     private String eventName;
+
+    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @EventDate
+    private String eventDate;
+
+    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotBlank (message = LoginServerConstants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    private String eventLocation;
+
+    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotBlank (message = LoginServerConstants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    private String eventCategories;
+
+    @NotBlank (message = LoginServerConstants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @Size (max = LoginServerConstants.EVENT_DESCRIPTION_SIZE_CONSTRAINT,
+            message = LoginServerConstants.EVENT_DESCRIPTION_ERROR_MESSAGE)
+    private String eventDescription;
+
+    private int eventId;
     private String eventOrganizerId;
     private String eventOrganizerName;
-    @NotEmpty (message = "Wrong event Date")
-    private String eventDate;
-    @NotEmpty (message = "Wrong event Location")
-    private String eventLocation;
-    @NotEmpty (message = "Wrong event Categories")
-    private String eventCategories;
-    @NotEmpty (message = "Wrong event Description")
-    private String eventDescription;
+
+
+
+
+
+
     @Digits(integer = 4, fraction = 0 ,message = "wrong total ticket")
     private int totalTickets;
     private int ticketsAvailable;
-    private String eventStatus;
     private String eventCreatedOn;
 
     /**
@@ -57,14 +78,11 @@ public class Event {
      * @param eventDescription
      * @param totalTickets
      * @param ticketsAvailable
-     * @param eventStatus
      * @param eventCreatedOn
      */
-    public Event(int eventId, String eventName, String eventDate,
-                 String eventOrganizerName, String eventLocation,
-                 String eventCategories, String eventDescription,
-                 int totalTickets, int ticketsAvailable,
-                 String eventStatus, String eventCreatedOn) {
+    public Event(int eventId, String eventName, String eventDate, String eventOrganizerName,
+                 String eventLocation, String eventCategories, String eventDescription,
+                 int totalTickets, int ticketsAvailable, String eventCreatedOn) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventDate = eventDate;
@@ -74,7 +92,6 @@ public class Event {
         this.eventDescription = eventDescription;
         this.totalTickets = totalTickets;
         this.ticketsAvailable = ticketsAvailable;
-        this.eventStatus = eventStatus;
         this.eventCreatedOn = eventCreatedOn;
 
     }
@@ -121,10 +138,6 @@ public class Event {
             if (!rs.wasNull()) {
                 this.ticketsAvailable = rs.getInt("tickets_available");
                 System.out.println("ticketsAvailable :" + ticketsAvailable);
-            }
-            if (!rs.wasNull()) {
-                this.eventStatus = rs.getString("event_status");
-                System.out.println("eventStatus :" + eventStatus);
             }
             if (!rs.wasNull()) {
                 this.eventCreatedOn = rs.getString("created_on");
@@ -217,14 +230,6 @@ public class Event {
     }
 
     /**
-     * getter for class attribute eventStatus.
-     * @return eventStatus
-     */
-    public String getEventStatus() {
-        return eventStatus;
-    }
-
-    /**
      * getter for class attribute eventCreatedOn.
      * @return eventCreatedOn
      */
@@ -310,14 +315,6 @@ public class Event {
      */
     public void setTicketsAvailable(int ticketsAvailable) {
         this.ticketsAvailable = ticketsAvailable;
-    }
-
-    /**
-     * setter for class attribute eventStatus.
-     * @return eventStatus
-     */
-    public void setEventStatus(String eventStatus) {
-        this.eventStatus = eventStatus;
     }
 
     /**

@@ -1,5 +1,9 @@
 package model;
 
+import web.login.LoginServerConstants;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * stores information provided by user for searching events by category page.
  * It contains following attributes :-
@@ -10,9 +14,10 @@ package model;
  */
 public class EventSearchKeyValue {
 
+    @NotNull (message = LoginServerConstants.FILED_NOT_NULL_ERROR_MESSAGE)
+    private String searchTerm;
     private String searchCategory;
     private String searchType;
-    private String searchTerm;
 
     /**
      * Constructor

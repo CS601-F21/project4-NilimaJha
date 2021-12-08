@@ -14,10 +14,12 @@ import java.util.ArrayList;
  */
 public class TicketTransfer {
 
-    @TransferTicketIdList(message = "No Ticket Selected.")
+    @TransferTicketIdList
     private ArrayList<Integer> ticketIdList = new ArrayList<>();
-    @TransfereeEmail(message = "User with Given Email Id doesn't exist. Enter Valid User.")
+
+    @TransfereeEmail
     private String transferee;
+
     private String transferor;
 
     /**
