@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static jdbc.JDBCUserTableOperations.findUserFromUserInfoByEmailId;
 
@@ -62,5 +63,21 @@ public class Utilities {
         } else {
             return true;
         }
+    }
+
+    public static String currentDate() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        return dtf.format(now);
+    }
+
+    public static String searchCategory(String searchCategory) {
+        String[] searchCategoryList = searchCategory.split("_");
+        String searchCategoryText = "";
+        for (String s : searchCategoryList) {
+            searchCategoryText += s;
+            searchCategoryText += " ";
+        }
+        return searchCategoryText;
     }
 }

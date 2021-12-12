@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static jdbc.JDBCEventTableOperations.*;
+import static utils.Utilities.searchCategory;
 
 /**
  * Controller class that handles request related to events like
@@ -73,7 +74,6 @@ public class EventController {
             } else {
                 Event event = new Event();
                 model.addAttribute("event", event);
-                System.out.println("Inside updateProfileShoeMethod method.  Model attribute set");
                 return "createEventForm";
             }
         } else {
@@ -170,7 +170,6 @@ public class EventController {
                 model.addAttribute("title", title);
                 model.addAttribute("tableCaption", tableCaption);
                 model.addAttribute("eventList", eventList);
-                System.out.println("Inside allEvents method.  Model attribute set");
                 return "viewAllEvents";
             }
         } else {
@@ -195,7 +194,6 @@ public class EventController {
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
         if (emailId != null) {
-            System.out.println("eventId: "+ eventId);
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
                 try{
@@ -215,7 +213,6 @@ public class EventController {
                     throwable.printStackTrace();
                 }
                 model.addAttribute("event", event);
-                System.out.println("Inside events method.  Model attribute set");
                 return "viewEvent";
             }
         } else {
@@ -243,8 +240,8 @@ public class EventController {
                 User user = new User();
                 try{
                     user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
                 }
                 model.addAttribute("user", user);
 //                model.addAttribute("upcomingEventList", userUpcomingEventList);
@@ -281,11 +278,10 @@ public class EventController {
                 User user = new User();
                 try{
                     user = JDBCUserTableOperations.findUserFromUserInfoByEmailId(emailId);
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
                 }
                 model.addAttribute("user", user);
-//                model.addAttribute("upcomingEventList", userUpcomingEventList);
                 return "completeProfile";
             } else {
                 List<Event> eventList = new ArrayList<>();
@@ -298,7 +294,9 @@ public class EventController {
                     e.printStackTrace();
                 }
                 String title = "List Of Active Events...";
-                String tableCaption = "Search Result Where  " + searchCategory + " " + searchType + " " + searchTerm;
+                String tableCaption = "Search Result Where  "
+                        + searchCategory(searchCategory) + " "
+                        + searchType + " " + searchTerm;
                 model.addAttribute("title", title);
                 model.addAttribute("tableCaption", tableCaption);
                 model.addAttribute("eventList", eventList);
@@ -347,7 +345,6 @@ public class EventController {
                 model.addAttribute("title", title);
                 model.addAttribute("tableCaption", tableCaption);
                 model.addAttribute("eventList", eventList);
-                System.out.println("Inside allEvents method.  Model attribute set");
                 return "viewAllEvents";
             }
         } else {
