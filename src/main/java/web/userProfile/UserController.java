@@ -139,7 +139,9 @@ public class UserController {
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
+        System.out.println(">>>>>>>>>>>>>>>>>>" + user.getDateOfBirth());
         if (bindingResult.hasErrors()){
+            System.out.println("Binding has error, " + user.getDateOfBirth());
             return "updateProfile";
         }
         if (emailId != null) {

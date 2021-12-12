@@ -90,9 +90,7 @@ public class LoginUtilities {
      * @return
      */
     public static Map<String, Object> jsonStrToMap(String jsonString) {
-        System.out.println("jsonString from slack :-" + jsonString);
         Map<String, Object> map = gson.fromJson(new StringReader(jsonString), Map.class);
-        System.out.println("State :" +map.get(LoginServerConstants.STATE_KEY));
         return map;
     }
 
@@ -145,9 +143,7 @@ public class LoginUtilities {
         // Decoding process taken from:
         // https://www.baeldung.com/java-jwt-token-decode
         String[] chunks = idToken.split("\\.");
-        System.out.println("Idtoken: " + idToken);
         Base64.Decoder decoder = Base64.getDecoder();
-        System.out.println(chunks[1]);
 
         String header = new String(decoder.decode(chunks[0]));
         String payload = new String(decoder.decode(chunks[1]));

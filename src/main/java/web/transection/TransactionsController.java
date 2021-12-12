@@ -66,8 +66,8 @@ public class TransactionsController {
                 User user = new User();
                 try{
                     user = findUserFromUserInfoByEmailId(emailId);
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
                 }
                 model.addAttribute("user", user);
                 return "completeProfile";
@@ -216,12 +216,10 @@ public class TransactionsController {
      */
     @PostMapping("/user/tickets")
     protected String transferTickets(HttpServletRequest req, @Valid @ModelAttribute("ticketTransfer") TicketTransfer ticketTransfer, BindingResult bindingResult, Model model) {
-        System.out.println("1.....Inside Transfer Ticket Post.");
         // retrieve the ID of this session
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
-        System.out.println("2.....Inside Transfer Ticket Post.");
         if (emailId != null) {
             // already authed, no need to log in
             if (!Utilities.isUserProfileComplete(emailId)) {
@@ -232,19 +230,15 @@ public class TransactionsController {
                     throwable.printStackTrace();
                 }
                 model.addAttribute("user", user);
-//                model.addAttribute("upcomingEventList", userUpcomingEventList);
                 return "completeProfile";
             } else {
                 ticketTransfer.setTransferor(emailId);
                 boolean transferSuccessful = false;
                 try {
                     if (bindingResult.hasErrors() || ticketTransfer.getTransferee().equals(ticketTransfer.getTransferor())){
-                        System.out.println("*******HAS ERRORS*******");
                         User user = findUserFromUserInfoByEmailId(ticketTransfer.getTransferee());
-                        System.out.println("*******HAS ERRORS*******222");
                         List<UserUpcomingEvent> userUpcomingEventList = null;
                         userUpcomingEventList = usersUpcomingTicketsWithEventInfo(ticketTransfer.getTransferor());
-                        System.out.println("*******HAS ERRORS*******333");
                         String tableCaption = "Your all active tickets.";
                         String title = "Ticket Transfer Page";
                         model.addAttribute("title", title);
