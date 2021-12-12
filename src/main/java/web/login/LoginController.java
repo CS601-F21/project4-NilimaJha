@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import utils.Utilities;
-import web.HttpServer;
+import web.TicketPurchaseApp;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -62,10 +62,10 @@ public class LoginController {
             String state = sessionId;
             String nonce = LoginUtilities.generateNonce(state);
             // Generate url for request to Slack
-            String url = LoginUtilities.generateSlackAuthorizeURL(HttpServer.loginWithSlackConfig.getClient_id(),
+            String url = LoginUtilities.generateSlackAuthorizeURL(TicketPurchaseApp.loginWithSlackConfig.getClient_id(),
                     state,
                     nonce,
-                    HttpServer.loginWithSlackConfig.getRedirect_url());
+                    TicketPurchaseApp.loginWithSlackConfig.getRedirect_url());
 
             model.addAttribute("url", url);
             return "login";
@@ -116,9 +116,9 @@ public class LoginController {
                 return "redirect:/";
             } else {
                 // generate the url to use to exchange the code for a token using "/openid.connect.token method".
-                String url = LoginUtilities.generateSlackTokenURL(HttpServer.loginWithSlackConfig.getClient_id(),
-                        HttpServer.loginWithSlackConfig.getClient_secret(), code,
-                        HttpServer.loginWithSlackConfig.getRedirect_url());
+                String url = LoginUtilities.generateSlackTokenURL(TicketPurchaseApp.loginWithSlackConfig.getClient_id(),
+                        TicketPurchaseApp.loginWithSlackConfig.getClient_secret(), code,
+                        TicketPurchaseApp.loginWithSlackConfig.getRedirect_url());
                 // Make the request to the token API
                 String responseString = HTTPFetcher.doGet(url, null);
                 Map<String, Object> response = LoginUtilities.jsonStrToMap(responseString);

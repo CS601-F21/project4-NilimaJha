@@ -14,7 +14,7 @@ import java.io.FileReader;
  * @author nilimajha
  */
 @SpringBootApplication
-public class HttpServer {
+public class TicketPurchaseApp {
 
     public static LoginWithSlackConfig loginWithSlackConfig;
     static {
@@ -33,6 +33,6 @@ public class HttpServer {
      * @param args
      */
     public static void main(String[] args) {
-        SpringApplication.run(HttpServer.class, args);
+        SpringApplication.run(TicketPurchaseApp.class, args);
     }
 }
