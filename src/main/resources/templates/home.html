@@ -6,12 +6,13 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
               rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
               crossorigin="anonymous">
+        <link th:href="@{/main.css}" rel="stylesheet" />
+
     </head>
 
     <body>
-
         <header>
-            <h1 style="color: navy;" class=""><center><u>Home Page<br/></u></center></h1>
+            <h1 style="color: navy;" class=""><u>Home Page<br/></u></h1>
             <nav>
                 <ul class="nav justify-content-end">
                     <li class="nav-item">
@@ -26,37 +27,35 @@
             <a class="btn btn-primary" href="/viewProfile" role="button">View Profile</a>
             <a class="btn btn-primary" href="/updateProfile" role="button">Update Profile</a>
             <a class="btn btn-primary" href="/events" role="button">All Active Events</a>
-            <a class="btn btn-primary" href="/eventsBy" role="button">Find Event By</a>
+            <a class="btn btn-primary" href="/eventsBy" role="button">Search Events</a>
             <a class="btn btn-primary" href="/user/transaction" role="button">View Transaction</a>
             <a class="btn btn-primary" href="/createEvent" role="button">Create New Event</a>
-<!--            <a class="btn btn-primary" href="#" role="button">Purchase Tickets</a>-->
-            <a class="btn btn-primary" href="/user/tickets" role="button">Transfer Tickets</a>
+            <a class="btn btn-primary" href="/user/tickets" role="button">View / Transfer Tickets</a>
             <hr/>
-            <h3 style="color: SlateBlue;" >Hello, <span th:text="${user.userName}"></span>!</h3>
-            <p><center><b>Your upcoming events are...</b></center></p>
-<!--            Show list of all the tickets belonging to the user with user_email_id.-->
+            <h3 style="color: SlateBlue;" >Welcome, <span th:text="${user.userName}"></span> !!!</h3>
+            <p><b>Your upcoming events are ...</b></p><br/>
             <span>
-                <table class="table table-bordered border-primary caption-top">
+                <table class="table table-striped caption-top">
                     <thead>
-                    <caption style="color: navy;"><center><b><span th:text="${tableCaption}"></span></b></center></caption>
-                        <tr style="color: SteelBlue;">
-                            <th width="5%"><center>Event Id</center></th>
-                            <th width="30"><center>Event Name</center></th>
-                            <th width="25"><center>Event Date</center></th>
-                            <th width="30%"><center>Event Categories</center></th>
-                            <th width="10%"><center>Total Tickets</center></th>
+                    <caption style="color: navy;"><b><span th:text="${tableCaption}"></span></b></caption>
+                        <tr>
+                            <th style="color: navy;">Event Id</th>
+                            <th style="color: navy;">Event Name</th>
+                            <th style="color: navy;">Event Date</th>
+                            <th style="color: navy;">Event Categories</th>
+                            <th style="color: navy;">Total Tickets</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${upcomingEventList.empty}">
-                            <td colspan="5"><center>No Upcoming Events</center></td>
+                            <td colspan="5">No Upcoming Events</td>
                         </tr>
                         <tr th:unless= "${upcomingEventList.empty}" th:each="upcomingEvent : ${upcomingEventList}">
-                            <td><center><span th:text="${upcomingEvent.event.eventId}"></span></center></td>
-                            <td><center><span th:text="${upcomingEvent.event.eventName}"></span></center></td>
-                            <td><center><span th:text="${upcomingEvent.event.eventDate}"></span></center></td>
-                            <td><center><span th:text="${upcomingEvent.event.eventCategories}"></span></center></td>
-                            <td><center><span th:text="${upcomingEvent.totalTickets}"></span></center></td>
+                            <td><span th:text="${upcomingEvent.event.eventId}"></span></td>
+                            <td><span th:text="${upcomingEvent.event.eventName}"></span></td>
+                            <td><span th:text="${upcomingEvent.event.eventDate}"></span></td>
+                            <td><span th:text="${upcomingEvent.event.eventCategories}"></span></td>
+                            <td><span th:text="${upcomingEvent.totalTickets}"></span></td>
                         </tr>
                     </tbody>
                 </table>
