@@ -45,7 +45,6 @@ public class JDBCUserTableOperations {
             String selectUserInfoSql = "SELECT * FROM usersInfo WHERE user_email_id = ?;";
             PreparedStatement selectUserInfoSqlStmt = connection.prepareStatement(selectUserInfoSql);
             selectUserInfoSqlStmt.setString(1, userEmailId);
-            System.out.println("Query on usersInfo: " + selectUserInfoSqlStmt);
             ResultSet resultSet = selectUserInfoSqlStmt.executeQuery();
             User user = new User(resultSet);
             return user;
@@ -58,8 +57,9 @@ public class JDBCUserTableOperations {
      */
     public static void updateUserInfoTable (String userEmailId, User user) throws SQLException {
 
+        String updateUserInfoSql = "UPDATE usersInfo SET user_name = ?, phone_number = ?, " +
+                "date_of_birth = ?, complete_profile = ? WHERE user_email_id = ?;";
         try (Connection connection = DBCPDataSource.getConnection()) {
-            String updateUserInfoSql = "UPDATE usersInfo SET user_name = ?, phone_number = ?, date_of_birth = ?, complete_profile = ? WHERE user_email_id = ?;";
             PreparedStatement updateUserInfoSqlStm = connection.prepareStatement(updateUserInfoSql);
             updateUserInfoSqlStm.setString(1, user.getUserName());
             updateUserInfoSqlStm.setString(2, user.getPhone());

@@ -40,7 +40,6 @@ public class JDBCEventTableOperations {
             createNewEventStm.setInt(8, event.getTotalTickets());
             createNewEventStm.executeUpdate();
         }
-        System.out.println("1 event inserted into db.");
     }
 
     /**
@@ -73,27 +72,6 @@ public class JDBCEventTableOperations {
         }
         return eventList;
     }
-
-
-
-//    /**
-//     * A method to perform select from userInfo table where user_email_id matches the given email_id.
-//     * A PrepareStatement is used to execute this query.
-//     * @throws SQLException
-//     */
-//    public static List<Event> findEventsByEventCreatorFromEventsTable (String eventOrganizerId) throws SQLException {
-//        //read-userInfoTableLock on usersInfo table
-//        List<Event> eventList = new ArrayList<>();
-//        try (Connection connection = DBCPDataSource.getConnection()) {
-//            String selectEventInfoSql = "SELECT * FROM events WHERE event_organizer = ?;";
-//            PreparedStatement selectEventInfoSqlStmt = connection.prepareStatement(selectEventInfoSql);
-//            selectEventInfoSqlStmt.setString(1, eventOrganizerId);
-//            System.out.println("Query on usersInfo: " + selectEventInfoSqlStmt);
-//            ResultSet resultSet = selectEventInfoSqlStmt.executeQuery();
-//            eventList = listOfObjFromResultSet(resultSet);
-//        }
-//        return eventList;
-//    }
 
     /**
      * method to make list of Event class object from result set obtained from DB.
