@@ -9,6 +9,10 @@ import web.login.LoginServerConstants;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
+/**
+ * spring boot application
+ * @author nilimajha
+ */
 @SpringBootApplication
 public class HttpServer {
 
@@ -24,6 +28,10 @@ public class HttpServer {
         }
     }
 
+    /**
+     * main method.
+     * @param args
+     */
     public static void main(String[] args) {
         SpringApplication.run(HttpServer.class, args);
     }
