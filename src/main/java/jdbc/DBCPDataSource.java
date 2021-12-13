@@ -19,8 +19,6 @@ public class DBCPDataSource {
     // -- https://www.geeksforgeeks.org/static-blocks-in-java/
     static {
         JDBCConfig config = Utilities.readJDBCConfig();
-        // TODO: do something other than exit the whole program
-        // if the config file cannot be found
         if(config == null) {
             System.exit(1);
         }

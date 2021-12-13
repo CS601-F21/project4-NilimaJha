@@ -69,7 +69,6 @@ public class EventController {
                     throwable.printStackTrace();
                 }
                 model.addAttribute("user", user);
-//                model.addAttribute("upcomingEventList", userUpcomingEventList);
                 return "completeProfile";
             } else {
                 Event event = new Event();
@@ -257,7 +256,6 @@ public class EventController {
     }
 
     /**
-     * (/eventSearchResult)
      * handles GET request on path /eventsByResult
      * validates user and then returns search result in a html page.
      *

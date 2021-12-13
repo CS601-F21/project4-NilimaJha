@@ -15,7 +15,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = TransferTicketIdListValidation.class)
 public @interface TransferTicketIdList {
-//    String message() default "No Ticket Selected.";
     String message() default ("No Ticket Selected.");
     Class<?>[] groups() default {};
     public abstract Class<? extends Payload>[] payload() default {};
