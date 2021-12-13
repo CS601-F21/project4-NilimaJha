@@ -52,6 +52,11 @@ public class Utilities {
         return false;
     }
 
+    /**
+     * method to check if the date in the string format is current date or past date.
+     * @param date
+     * @return true or false.
+     */
     public static boolean presentOrFutureDate(String date) {
         LocalDateTime inputDateTime = LocalDateTime.parse(date+"T00:00:00.000");
         LocalDateTime currentDateTime = LocalDateTime.now();
@@ -64,12 +69,23 @@ public class Utilities {
         }
     }
 
+    /**
+     * method to return current date in specified format and in the form of string.
+     * @return
+     */
     public static String currentDate() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
         return dtf.format(now);
     }
 
+    /**
+     * method to reformat string by
+     * removing '_' from string and
+     * making it separate words in the string.
+     * @param searchCategory
+     * @return
+     */
     public static String searchCategory(String searchCategory) {
         String[] searchCategoryList = searchCategory.split("_");
         String searchCategoryText = "";
