@@ -129,7 +129,6 @@ public class LoginUtilities {
     }
 
     /**
-     *
      * From the Slack documentation:
      * id_token is a standard JSON Web Token (JWT). You can decode it with off-the-shelf libraries in any programming
      * language, and most packages that handle OpenID will handle JWT decoding.
