@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import utils.Constants;
 import utils.Utilities;
 import web.TicketPurchaseApp;
 
@@ -84,7 +85,6 @@ public class LoginController {
      */
     @GetMapping("/home")
     protected String home(HttpServletRequest req, Model model) throws IOException {
-        System.out.println("Inside /home");
         // retrieve the ID of this session
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
@@ -111,8 +111,8 @@ public class LoginController {
             }
         } else {
             // retrieve the code provided by Slack
-            String code = req.getParameter(LoginServerConstants.CODE_KEY);
-            if (req.getParameter(LoginServerConstants.CODE_KEY) == null) {
+            String code = req.getParameter(Constants.CODE_KEY);
+            if (req.getParameter(Constants.CODE_KEY) == null) {
                 return "redirect:/";
             } else {
                 // generate the url to use to exchange the code for a token using "/openid.connect.token method".
@@ -174,11 +174,9 @@ public class LoginController {
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
-        System.out.println(">>> USERS EMAIL: " + emailId);
         if (emailId != null) {
             // already authed, no need to log in
             if (bindingResult.hasErrors()){
-                System.out.println("*******HAS ERRORS*******");
                 return "completeProfile";
             } else {
                 try {
@@ -208,7 +206,6 @@ public class LoginController {
         String emailId = (String) req.getSession().getAttribute("emailId");
         if (emailId != null) {
             // already authed, invalidating session and sending to the login page.
-            System.out.println("Logging out...");
             req.getSession().invalidate();
             return "redirect:/";
         } else {

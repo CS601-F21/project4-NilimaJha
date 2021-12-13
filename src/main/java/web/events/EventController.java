@@ -1,6 +1,6 @@
 package web.events;
 
-import jdbc.JDBCConnectionPool;
+import jdbc.JDBCTransactionTableOperations;
 import jdbc.JDBCUserTableOperations;
 import model.Event;
 import model.EventSearchKeyValue;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import utils.Utilities;
-import web.login.LoginServerConstants;
+import utils.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -120,8 +120,8 @@ public class EventController {
                 event.setEventOrganizerId(emailId);
                 try {
                     executeInsertIntoEvents(event);
-                    model.addAttribute("pageHeader", LoginServerConstants.CREATE_EVENT_SUCCESS_PAGE_HEADER);
-                    model.addAttribute("message", LoginServerConstants.CREATE_EVENT_SUCCESS_PAGE_MESSAGE);
+                    model.addAttribute("pageHeader", Constants.CREATE_EVENT_SUCCESS_PAGE_HEADER);
+                    model.addAttribute("message", Constants.CREATE_EVENT_SUCCESS_PAGE_MESSAGE);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -289,7 +289,7 @@ public class EventController {
                 String searchType = eventSearchKeyValue.getSearchType();
                 String searchTerm = eventSearchKeyValue.getSearchTerm();
                 try {
-                    eventList = JDBCConnectionPool.findEventsByPhraseFromEventsTable(searchCategory, searchType, searchTerm);
+                    eventList = JDBCTransactionTableOperations.findEventsByPhraseFromEventsTable(searchCategory, searchType, searchTerm);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

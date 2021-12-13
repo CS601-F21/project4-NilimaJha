@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import utils.LoginWithSlackConfig;
-import web.login.LoginServerConstants;
+import utils.Constants;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -22,7 +22,7 @@ public class TicketPurchaseApp {
         Gson gson = new Gson();
         try {
             loginWithSlackConfig = gson.fromJson(
-                    new FileReader(LoginServerConstants.SLACK_CONFIG_FILE_NAME), LoginWithSlackConfig.class);
+                    new FileReader(Constants.SLACK_CONFIG_FILE_NAME), LoginWithSlackConfig.class);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

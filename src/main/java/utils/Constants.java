@@ -1,9 +1,9 @@
-package web.login;
+package utils;
 
 /**
  * A helper class to maintain constants used for the LoginServer example.
  */
-public class LoginServerConstants {
+public class Constants {
 
     public static final String HOST = "slack.com";
     public static final String AUTH_PATH = "openid/connect/authorize";
@@ -51,6 +51,9 @@ public class LoginServerConstants {
 
     public static final int EVENT_NAME_SIZE_CONSTRAINT = 100;
     public static final String NAME_SIZE_ERROR_MESSAGE = "Name should be maximum of 100 character.";
+
+    public static final int USER_NAME_SIZE_CONSTRAINT = 100;
+    public static final String USER_NAME_ERROR_MESSAGE = "Name should be maximum of 100 character.";
 
     public static final String FILED_NOT_NULL_ERROR_MESSAGE = "This field can not be null.";
     public static final String FIELD_NOT_EMPTY_ERROR_MESSAGE = "This field can not be empty.";

@@ -1,7 +1,7 @@
 package model;
 
 import validation.EventDate;
-import web.login.LoginServerConstants;
+import utils.Constants;
 
 import javax.validation.constraints.*;
 import java.sql.ResultSet;
@@ -25,28 +25,28 @@ import static utils.Utilities.presentOrFutureDate;
  */
 public class Event {
 
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
-    @NotNull (message = LoginServerConstants.FILED_NOT_NULL_ERROR_MESSAGE)
-    @Size (max = LoginServerConstants.EVENT_NAME_SIZE_CONSTRAINT,
-            message = LoginServerConstants.NAME_SIZE_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotNull (message = Constants.FILED_NOT_NULL_ERROR_MESSAGE)
+    @Size (max = Constants.EVENT_NAME_SIZE_CONSTRAINT,
+            message = Constants.NAME_SIZE_ERROR_MESSAGE)
     private String eventName;
 
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
     @EventDate
     private String eventDate;
 
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
-    @NotBlank (message = LoginServerConstants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotBlank (message = Constants.FIELD_NOT_BLANK_ERROR_MESSAGE)
     private String eventLocation;
 
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
-    @NotBlank (message = LoginServerConstants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotBlank (message = Constants.FIELD_NOT_BLANK_ERROR_MESSAGE)
     private String eventCategories;
 
-    @NotBlank (message = LoginServerConstants.FIELD_NOT_BLANK_ERROR_MESSAGE)
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
-    @Size (max = LoginServerConstants.EVENT_DESCRIPTION_SIZE_CONSTRAINT,
-            message = LoginServerConstants.EVENT_DESCRIPTION_ERROR_MESSAGE)
+    @NotBlank (message = Constants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @Size (max = Constants.EVENT_DESCRIPTION_SIZE_CONSTRAINT,
+            message = Constants.EVENT_DESCRIPTION_ERROR_MESSAGE)
     private String eventDescription;
 
     @Digits(integer = 4, fraction = 0 ,message = "wrong total ticket")

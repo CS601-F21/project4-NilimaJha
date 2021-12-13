@@ -1,6 +1,6 @@
 package model;
 
-import web.login.LoginServerConstants;
+import utils.Constants;
 
 import javax.validation.constraints.NotNull;
 
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
  */
 public class EventSearchKeyValue {
 
-    @NotNull (message = LoginServerConstants.FILED_NOT_NULL_ERROR_MESSAGE)
+    @NotNull (message = Constants.FILED_NOT_NULL_ERROR_MESSAGE)
     private String searchTerm;
     private String searchCategory;
     private String searchType;

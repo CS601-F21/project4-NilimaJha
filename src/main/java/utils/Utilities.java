@@ -2,7 +2,6 @@ package utils;
 
 import com.google.gson.Gson;
 import model.User;
-import web.login.LoginServerConstants;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -27,7 +26,7 @@ public class Utilities {
         Gson gson = new Gson();
         //validate file exist at the location.
         try {
-            jdbcConfig = gson.fromJson(new FileReader(LoginServerConstants.JDBC_CONFIG_FILE_NAME), JDBCConfig.class);
+            jdbcConfig = gson.fromJson(new FileReader(Constants.JDBC_CONFIG_FILE_NAME), JDBCConfig.class);
         } catch (FileNotFoundException e) {
             System.err.println("Config file config.json not found: " + e.getMessage());
         }

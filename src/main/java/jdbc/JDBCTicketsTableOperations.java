@@ -2,15 +2,15 @@ package jdbc;
 
 import model.Tickets;
 import model.Transaction;
-import web.login.LoginServerConstants;
+import utils.Constants;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static jdbc.JDBCConnectionPool.generateTransactionDetailMessage;
-import static jdbc.JDBCConnectionPool.insertIntoTransactionTable;
+import static jdbc.JDBCTransactionTableOperations.generateTransactionDetailMessage;
+import static jdbc.JDBCTransactionTableOperations.insertIntoTransactionTable;
 
 /**
  * Class with methods to perform operation on Tickets table.
@@ -48,8 +48,8 @@ public class JDBCTicketsTableOperations {
                 updateTotalTicketValueSqlStm.setInt(2, tickets.getEventId());
                 updateTotalTicketValueSqlStm.executeUpdate();
                 // create constant file add transaction type = B
-                Transaction transaction = new Transaction(LoginServerConstants.TRANSACTION_TYPE_PURCHASED, tickets.getTicketOwnerId(), tickets.getEventId());
-                String transactionMessage = generateTransactionDetailMessage(LoginServerConstants.TRANSACTION_TYPE_PURCHASED);
+                Transaction transaction = new Transaction(Constants.TRANSACTION_TYPE_PURCHASED, tickets.getTicketOwnerId(), tickets.getEventId());
+                String transactionMessage = generateTransactionDetailMessage(Constants.TRANSACTION_TYPE_PURCHASED);
                 transaction.setTransactionDetail(transactionMessage);
                 Boolean updateTransactionTable = insertIntoTransactionTable(transaction);
                 return updateTransactionTable;

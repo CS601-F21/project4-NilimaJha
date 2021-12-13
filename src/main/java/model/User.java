@@ -1,7 +1,7 @@
 package model;
 
 import validation.UserBirthDate;
-import web.login.LoginServerConstants;
+import utils.Constants;
 
 import javax.validation.constraints.*;
 import java.sql.ResultSet;
@@ -21,15 +21,17 @@ import java.sql.SQLException;
  */
 public class User {
 
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
-    @NotBlank (message = LoginServerConstants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotBlank (message = Constants.FIELD_NOT_BLANK_ERROR_MESSAGE)
+    @Size (max = Constants.USER_NAME_SIZE_CONSTRAINT,
+            message = Constants.USER_NAME_ERROR_MESSAGE)
     private String userName;
 
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
     @UserBirthDate
     private String dateOfBirth;
 
-    @NotEmpty (message = LoginServerConstants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
+    @NotEmpty (message = Constants.FIELD_NOT_EMPTY_ERROR_MESSAGE)
     @Size(max = 10, min = 10, message = "Mobile number should be of 10 digits")
     @Pattern(regexp = "[1-9][0-9]{9}", message = "Mobile number is invalid!!")
     private String phone;

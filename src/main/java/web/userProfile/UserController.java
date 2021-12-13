@@ -47,7 +47,6 @@ public class UserController {
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
-        System.out.println(emailId);
         if (emailId != null) {
             // already authed, no need to log in
             if (!Utilities.isUserProfileComplete(emailId)) {
@@ -139,11 +138,6 @@ public class UserController {
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
-        System.out.println(">>>>>>>>>>>>>>>>>>" + user.getDateOfBirth());
-        if (bindingResult.hasErrors()){
-            System.out.println("Binding has error, " + user.getDateOfBirth());
-            return "updateProfile";
-        }
         if (emailId != null) {
             // already authed, no need to log in
             if (!Utilities.isUserProfileComplete(emailId)) {
@@ -155,6 +149,9 @@ public class UserController {
                 model.addAttribute("user", user);
                 return "completeProfile";
             } else {
+                if (bindingResult.hasErrors()){
+                    return "updateProfile";
+                }
                 try {
                     JDBCUserTableOperations.updateUserInfoTable(emailId, user);
                 } catch (SQLException e) {
@@ -163,6 +160,7 @@ public class UserController {
                 return "redirect:/viewProfile";
             }
         } else {
+            // not logged in redirecting to login page.
             return "redirect:/";
         }
     }

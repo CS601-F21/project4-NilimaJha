@@ -1,6 +1,6 @@
 package web.transection;
 
-import jdbc.JDBCConnectionPool;
+import jdbc.JDBCTransactionTableOperations;
 import model.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import utils.Utilities;
-import web.login.LoginServerConstants;
+import utils.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -60,7 +60,6 @@ public class TransactionsController {
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
         if (emailId != null) {
-            System.out.println("eventId: "+ eventId);
             // already authed, no need to log in
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
@@ -84,7 +83,6 @@ public class TransactionsController {
                 tickets.setTicketOwnerId(emailId);
                 model.addAttribute("event", event);
                 model.addAttribute("tickets", tickets);
-                System.out.println("Inside updateProfileShoeMethod method.  Model attribute set");
                 return "buyTicketForm";
             }
         } else {
@@ -106,14 +104,11 @@ public class TransactionsController {
      */
     @PostMapping("/event/{eventId}/ticketCount/")
     protected String buyTicket(HttpServletRequest req, @PathVariable("eventId") int eventId, @ModelAttribute("tickets") Tickets tickets, Model model) {
-        System.out.println("Inside /buyTicket Post");
         // retrieve the ID of this session
         String sessionId = req.getSession(true).getId();
         // retrieve userEmailId associated to this session.
         String emailId = (String) req.getSession().getAttribute("emailId");
-        System.out.println("Inside /buyTicket post. Getting email id from session: "+ emailId);
         if (emailId != null) {
-            System.out.println("session is not null");
             // already authed, no need to log in
             if (!Utilities.isUserProfileComplete(emailId)) {
                 User user = new User();
@@ -247,18 +242,18 @@ public class TransactionsController {
                         model.addAttribute("upcomingEventList", userUpcomingEventList);
                         return "transferTicketsPage";
                     } else {
-                        transferSuccessful = JDBCConnectionPool.updateTicketsAndTransactionTableForTransfer(ticketTransfer);
+                        transferSuccessful = JDBCTransactionTableOperations.updateTicketsAndTransactionTableForTransfer(ticketTransfer);
                     }
                 } catch(SQLException e) {
                     e.printStackTrace();
                 }
                 if (transferSuccessful) {
-                    model.addAttribute("pageHeader", LoginServerConstants.TICKET_TRANSFER_SUCCESS_PAGE_HEADER);
-                    model.addAttribute("message", LoginServerConstants.TICKET_TRANSFER_SUCCESS_PAGE_MESSAGE);
+                    model.addAttribute("pageHeader", Constants.TICKET_TRANSFER_SUCCESS_PAGE_HEADER);
+                    model.addAttribute("message", Constants.TICKET_TRANSFER_SUCCESS_PAGE_MESSAGE);
                     return "successfulPage";
                 } else {
-                    model.addAttribute("pageHeader", LoginServerConstants.TICKET_TRANSFER_UNSUCCESSFUL_PAGE_HEADER);
-                    model.addAttribute("message", LoginServerConstants.TICKET_TRANSFER_UNSUCCESSFUL_PAGE_MESSAGE);
+                    model.addAttribute("pageHeader", Constants.TICKET_TRANSFER_UNSUCCESSFUL_PAGE_HEADER);
+                    model.addAttribute("message", Constants.TICKET_TRANSFER_UNSUCCESSFUL_PAGE_MESSAGE);
                     return "unsuccessfulPage";
                 }
             }
@@ -297,7 +292,7 @@ public class TransactionsController {
             } else {
                 List<Transaction> transactionList = new ArrayList<>();
                 try {
-                    transactionList = JDBCConnectionPool.allTransactionOfUser(emailId);
+                    transactionList = JDBCTransactionTableOperations.allTransactionOfUser(emailId);
                 } catch(SQLException e) {
                     e.printStackTrace();
                 }

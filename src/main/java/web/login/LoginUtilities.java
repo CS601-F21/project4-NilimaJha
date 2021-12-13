@@ -3,10 +3,10 @@ package web.login;
 import com.google.gson.Gson;
 import model.User;
 import org.apache.commons.codec.digest.DigestUtils;
+import utils.Constants;
 
 import java.io.StringReader;
 import java.util.Base64;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,19 +41,19 @@ public class LoginUtilities {
     public static String generateSlackAuthorizeURL(String clientId, String state, String nonce, String redirectURI) {
 
         String url = String.format("https://%s/%s?%s=%s&%s=%s&%s=%s&%s=%s&%s=%s&%s=%s",
-                LoginServerConstants.HOST,
-                LoginServerConstants.AUTH_PATH,
-                LoginServerConstants.RESPONSE_TYPE_KEY,
-                LoginServerConstants.RESPONSE_TYPE_VALUE,
-                LoginServerConstants.SCOPE_KEY,
-                LoginServerConstants.SCOPE_VALUE,
-                LoginServerConstants.CLIENT_ID_KEY,
+                Constants.HOST,
+                Constants.AUTH_PATH,
+                Constants.RESPONSE_TYPE_KEY,
+                Constants.RESPONSE_TYPE_VALUE,
+                Constants.SCOPE_KEY,
+                Constants.SCOPE_VALUE,
+                Constants.CLIENT_ID_KEY,
                 clientId,
-                LoginServerConstants.STATE_KEY,
+                Constants.STATE_KEY,
                 state,
-                LoginServerConstants.NONCE_KEY,
+                Constants.NONCE_KEY,
                 nonce,
-                LoginServerConstants.REDIRECT_URI_KEY,
+                Constants.REDIRECT_URI_KEY,
                 redirectURI
         );
         return url;
@@ -70,15 +70,15 @@ public class LoginUtilities {
     public static String generateSlackTokenURL(String clientId, String clientSecret, String code, String redirectURI) {
 
         String url = String.format("https://%s/%s?%s=%s&%s=%s&%s=%s&%s=%s",
-                LoginServerConstants.HOST,
-                LoginServerConstants.TOKEN_PATH,
-                LoginServerConstants.CLIENT_ID_KEY,
+                Constants.HOST,
+                Constants.TOKEN_PATH,
+                Constants.CLIENT_ID_KEY,
                 clientId,
-                LoginServerConstants.CLIENT_SECRET_KEY,
+                Constants.CLIENT_SECRET_KEY,
                 clientSecret,
-                LoginServerConstants.CODE_KEY,
+                Constants.CODE_KEY,
                 code,
-                LoginServerConstants.REDIRECT_URI_KEY,
+                Constants.REDIRECT_URI_KEY,
                 redirectURI
         );
         return url;
@@ -104,11 +104,11 @@ public class LoginUtilities {
      */
     public static User verifyTokenResponse(Map<String, Object> map, String sessionId) {
         // verify ok: true
-        if(!map.containsKey(LoginServerConstants.OK_KEY) || !(boolean)map.get(LoginServerConstants.OK_KEY)) {
+        if(!map.containsKey(Constants.OK_KEY) || !(boolean)map.get(Constants.OK_KEY)) {
             return null;
         }
         // verify state is the users session cookie id
-        if(!map.containsKey(LoginServerConstants.STATE_KEY) || !map.get(LoginServerConstants.STATE_KEY).equals(sessionId)) {
+        if(!map.containsKey(Constants.STATE_KEY) || !map.get(Constants.STATE_KEY).equals(sessionId)) {
             return null;
         }
         // retrieve and decode id_token
@@ -116,15 +116,15 @@ public class LoginUtilities {
         Map<String, Object> payloadMap = decodeIdTokenPayload(idToken);
         //verify nonce
         String expectedNonce = generateNonce(sessionId);
-        String actualNonce = (String) payloadMap.get(LoginServerConstants.NONCE_KEY);
+        String actualNonce = (String) payloadMap.get(Constants.NONCE_KEY);
         if(!expectedNonce.equals(actualNonce)) {
             return null;
         }
         // extract name from response
         Set<String> set = payloadMap.keySet();
-        String userName = (String) payloadMap.get(LoginServerConstants.NAME_KEY);
-        String userEmailId = (String) payloadMap.get(LoginServerConstants.EMAIL_KEY);
-        String userAccessToken = (String)map.get(LoginServerConstants.ACCESS_TOKEN_KEY);
+        String userName = (String) payloadMap.get(Constants.NAME_KEY);
+        String userEmailId = (String) payloadMap.get(Constants.EMAIL_KEY);
+        String userAccessToken = (String)map.get(Constants.ACCESS_TOKEN_KEY);
         return new User(userEmailId, userName, userAccessToken);
     }
 
